@@ -76,9 +76,12 @@ export async function uploadDocument(
   if (payload.source === "file" && payload.file) fd.append("file", payload.file);
   if (payload.source === "url" && payload.url) fd.append("url", payload.url);
 
+  // 주의: Content-Type 을 명시하지 않는다 — axios 가 FormData 를 인식하면
+  // boundary 가 포함된 `multipart/form-data; boundary=...` 를 자동 설정한다.
+  // 수동으로 'multipart/form-data' 만 주면 boundary 가 빠져 multer 가 파싱 실패한다.
   const res = await api.post<
     Envelope<{ docId: number; title: string; indexStatus: DocumentStatus; message: string }>
-  >("/docs", fd, { headers: { "Content-Type": "multipart/form-data" } });
+  >("/docs", fd);
   return res.data.data;
 }
 
@@ -97,7 +100,7 @@ export async function updateDocument(
 
   const res = await api.put<
     Envelope<{ docId: number; title: string; indexStatus: DocumentStatus; message: string }>
-  >(`/docs/${id}`, fd, { headers: { "Content-Type": "multipart/form-data" } });
+  >(`/docs/${id}`, fd);
   return res.data.data;
 }
 
