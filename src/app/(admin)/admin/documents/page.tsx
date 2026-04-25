@@ -11,12 +11,19 @@ import { useDocumentDetail } from '@/features/documents/hooks/useDocumentDetail'
 import type { DocumentSummary } from '@/features/documents/types';
 
 export default function DocumentsPage() {
-  const { data: documents, counts, isLoading } = useDocuments();
-  
+  const { data: documents, counts, isLoading, refetch: refetchDocuments } = useDocuments();
+
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
 
-  const { data: documentDetail, isLoading: isDetailLoading } = useDocumentDetail(selectedDocumentId);
+  const { data: documentDetail, refetch: refetchDetail } = useDocumentDetail(selectedDocumentId);
+
+  const handleListMutated = () => {
+    void refetchDocuments();
+    if (selectedDocumentId != null) {
+      void refetchDetail();
+    }
+  };
 
   const handleUploadClick = () => {
     setIsUploadModalOpen(true);
@@ -62,15 +69,17 @@ export default function DocumentsPage() {
           </>
         )}
 
-        <DocumentUploadModal 
-          isOpen={isUploadModalOpen} 
-          onClose={handleCloseUploadModal} 
+        <DocumentUploadModal
+          isOpen={isUploadModalOpen}
+          onClose={handleCloseUploadModal}
+          onUploaded={handleListMutated}
         />
-        
-        <DocumentDetailPanel 
-          document={documentDetail} 
-          isOpen={!!selectedDocumentId} 
-          onClose={handleCloseDetailPanel} 
+
+        <DocumentDetailPanel
+          document={documentDetail}
+          isOpen={!!selectedDocumentId}
+          onClose={handleCloseDetailPanel}
+          onMutated={handleListMutated}
         />
       </div>
     </div>

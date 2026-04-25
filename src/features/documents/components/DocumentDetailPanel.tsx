@@ -1,15 +1,48 @@
 import React from 'react';
 import type { DocumentDetail } from '../types';
 import MarkdownEditor from './MarkdownEditor';
+import {
+  useDeleteDocument,
+  useReindexDocument,
+} from '../hooks/useDocumentMutations';
 
 interface DocumentDetailPanelProps {
   document: DocumentDetail | null;
   isOpen: boolean;
   onClose: () => void;
+  onMutated?: () => void; // 삭제/재색인 성공 시 부모(useDocuments.refetch)
 }
 
-export default function DocumentDetailPanel({ document, isOpen, onClose }: DocumentDetailPanelProps) {
+export default function DocumentDetailPanel({ document, isOpen, onClose, onMutated }: DocumentDetailPanelProps) {
+  const del = useDeleteDocument();
+  const reidx = useReindexDocument();
+
   if (!isOpen || !document) return null;
+
+  const handleDelete = async () => {
+    if (!window.confirm(`"${document.title}" 문서를 삭제하시겠습니까? 관련 청크와 색인이 함께 삭제됩니다.`)) {
+      return;
+    }
+    try {
+      await del.mutate(document.id);
+      onMutated?.();
+      onClose();
+    } catch {
+      // hook 에러 표시
+    }
+  };
+
+  const handleReindex = async () => {
+    try {
+      await reidx.mutate(document.id);
+      onMutated?.();
+    } catch {
+      // hook 에러 표시
+    }
+  };
+
+  const busy = del.isPending || reidx.isPending;
+  const mutationError = del.error ?? reidx.error;
 
   return (
     <div className="fixed inset-0 z-40 overflow-hidden">
@@ -68,49 +101,62 @@ export default function DocumentDetailPanel({ document, isOpen, onClose }: Docum
                 </div>
               </div>
 
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Document URL</h3>
-                <div className="flex rounded-md shadow-sm">
-                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                    </svg>
-                  </span>
-                  <input
-                    type="text"
-                    readOnly
-                    className="flex-1 block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300 bg-gray-50"
-                    value={document.sourceUrl || "https://docs.example.com/"}
-                  />
+              {document.sourceUrl && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-medium text-gray-500 mb-1">Document URL</h3>
+                  <div className="flex rounded-md shadow-sm">
+                    <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                      </svg>
+                    </span>
+                    <input
+                      type="text"
+                      readOnly
+                      className="flex-1 block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300 bg-gray-50"
+                      value={document.sourceUrl}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="h-[600px]">
-                <MarkdownEditor initialContent={document.markdown} />
-              </div>
+              {document.markdown && (
+                <div className="h-[600px]">
+                  <MarkdownEditor initialContent={document.markdown} />
+                </div>
+              )}
+
+              {mutationError && (
+                <p className="mt-4 text-sm text-red-600">{mutationError}</p>
+              )}
             </div>
 
             {/* Footer */}
             <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
               <button
                 type="button"
-                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                disabled={busy}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                onClick={handleDelete}
               >
-                삭제
+                {del.isPending ? '삭제 중…' : '삭제'}
               </button>
               <div className="flex space-x-3">
                 <button
                   type="button"
-                  className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  disabled={busy}
+                  className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                   onClick={onClose}
                 >
-                  취소
+                  닫기
                 </button>
                 <button
                   type="button"
-                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  disabled={busy}
+                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                  onClick={handleReindex}
                 >
-                  저장 및 재인덱싱
+                  {reidx.isPending ? '재색인 중…' : '재색인'}
                 </button>
               </div>
             </div>
