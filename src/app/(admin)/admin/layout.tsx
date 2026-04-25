@@ -4,7 +4,7 @@ import AdminTopNav from "@/components/layout/AdminTopNav";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AuthGuard>
+    // <AuthGuard> 개발동안 잠시 꺼두겠음
       <div className="flex min-h-screen">
         <AdminSidebar />
         <div className="flex flex-1 flex-col">
@@ -12,6 +12,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <main className="flex-1 p-8">{children}</main>
         </div>
       </div>
-    </AuthGuard>
+    // </AuthGuard>
   );
 }
