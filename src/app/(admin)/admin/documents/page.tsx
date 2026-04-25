@@ -14,7 +14,7 @@ export default function DocumentsPage() {
   const { data: documents, counts, isLoading } = useDocuments();
   
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+  const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
 
   const { data: documentDetail, isLoading: isDetailLoading } = useDocumentDetail(selectedDocumentId);
 

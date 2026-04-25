@@ -50,11 +50,12 @@ export default function DocumentDetailPanel({ document, isOpen, onClose }: Docum
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-1">Status</h3>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    document.status === 'INDEXED' ? 'bg-green-100 text-green-800' :
-                    document.status === 'INDEXING' ? 'bg-blue-100 text-blue-800' :
+                    document.status === 'indexed' ? 'bg-green-100 text-green-800' :
+                    document.status === 'indexing' ? 'bg-blue-100 text-blue-800' :
+                    document.status === 'pending' ? 'bg-gray-100 text-gray-800' :
                     'bg-red-100 text-red-800'
                   }`}>
-                    {document.status === 'INDEXED' ? '✅ 인덱싱 완료' : document.status}
+                    {document.status === 'indexed' ? '✅ 인덱싱 완료' : document.status}
                   </span>
                 </div>
                 <div>

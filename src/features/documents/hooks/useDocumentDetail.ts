@@ -23,12 +23,12 @@ function helloWorkspace() {
 \`\`\`
 `;
 
-export function useDocumentDetail(id: string | null) {
+export function useDocumentDetail(id: number | null) {
   const [data, setData] = useState<DocumentDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!id) {
+    if (id == null) {
       setData(null);
       return;
     }
@@ -40,7 +40,7 @@ export function useDocumentDetail(id: string | null) {
         id,
         title: '뤼이도 핵심 개념.md',
         category: '시작하기',
-        status: 'INDEXED',
+        status: 'indexed',
         sourceUrl: 'https://docs.example.com/guide',
         markdown: MOCK_MARKDOWN
       });
