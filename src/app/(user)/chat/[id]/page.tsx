@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import api from "@/lib/api";
+import Navbar from "@/components/Navbar";
 
 interface Message {
   role: "user" | "assistant";
@@ -18,12 +19,10 @@ export default function ChatRoomPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const imageInputRef = useRef<HTMLInputElement>(null);
-  const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const [isClosing, setIsClosing] = useState(false);
   const messageInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
 
   useEffect(() => {
     const initSession = async () => {
@@ -51,24 +50,6 @@ export default function ChatRoomPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  useEffect(() => {
-    if (!showEmojiPicker || !emojiPickerRef.current) return;
-    const container = emojiPickerRef.current;
-    container.innerHTML = "";
-    import("emoji-picker-element").then(() => {
-      const picker = document.createElement("emoji-picker");
-      picker.setAttribute("locale", "ko");
-      picker.style.width = "100%";
-      picker.style.height = "100%";
-      picker.style.border = "none";
-      picker.style.borderRadius = "20px";
-      picker.addEventListener("emoji-click", (e: any) => {
-        setMessage((prev) => prev + e.detail.unicode);
-        setShowEmojiPicker(false);
-      });
-      container.appendChild(picker);
-    });
-  }, [showEmojiPicker]);
 
   const handleSend = async () => {
     if (!message.trim() || !sessionId || isStreaming) return;
@@ -136,8 +117,16 @@ export default function ChatRoomPage() {
     setShowAttachMenu(false);
   };
 
+  const closeAttachMenu = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setShowAttachMenu(false);
+      setIsClosing(false);
+    }, 300);
+  };
+
   return (
-    <main className="relative w-[400px] h-[760px] bg-[#f0f0ff] font-sans overflow-hidden flex flex-col">
+    <main className="relative w-[400px] h-[760px] bg-[#f0f0ff] font-sans flex flex-col">
       <header className="bg-white px-4 py-3 flex items-center justify-between border-b border-gray-100 z-20 h-[70px] shrink-0">
         <div className="flex items-center gap-2">
           <button onClick={() => router.back()} className="w-8 h-8 flex items-center justify-center">
@@ -183,59 +172,14 @@ export default function ChatRoomPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      {showAttachMenu && (
-        <>
-          <div className="absolute inset-0 z-30" onClick={() => setShowAttachMenu(false)} />
-          <div className="absolute bottom-[88px] left-4 z-40 bg-white rounded-[20px] shadow-lg border border-black/5 overflow-hidden w-[180px]">
-            <button
-              onClick={() => { fileInputRef.current?.click(); setShowAttachMenu(false); }}
-              className="w-full flex items-center gap-3 px-5 py-4 text-[14px] font-bold text-[#3a3a3a] active:bg-gray-50"
-            >
-              <div className="w-5 h-5 bg-[#5745ff]" style={{ maskImage: 'url(/icons/icon-file.svg)', WebkitMaskImage: 'url(/icons/icon-file.svg)', maskSize: 'contain', WebkitMaskSize: 'contain' }} />
-              파일
-            </button>
-            <div className="h-px bg-black/5 mx-4" />
-            <button
-              onClick={() => { imageInputRef.current?.click(); setShowAttachMenu(false); }}
-              className="w-full flex items-center gap-3 px-5 py-4 text-[14px] font-bold text-[#3a3a3a] active:bg-gray-50"
-            >
-              <div className="w-5 h-5 bg-[#5745ff]" style={{ maskImage: 'url(/icons/icon-image.svg)', WebkitMaskImage: 'url(/icons/icon-image.svg)', maskSize: 'contain', WebkitMaskSize: 'contain' }} />
-              사진
-            </button>
-            <div className="h-px bg-black/5 mx-4" />
-            <button
-              onClick={() => { setShowAttachMenu(false); setShowEmojiPicker(true); }}
-              className="w-full flex items-center gap-3 px-5 py-4 text-[14px] font-bold text-[#3a3a3a] active:bg-gray-50"
-            >
-              <div className="w-5 h-5 bg-[#5745ff]" style={{ maskImage: 'url(/icons/icon-emoji.svg)', WebkitMaskImage: 'url(/icons/icon-emoji.svg)', maskSize: 'contain', WebkitMaskSize: 'contain' }} />
-              이모티콘
-            </button>
-          </div>
-        </>
-      )}
-
-      {showEmojiPicker && (
-        <>
-          <div className="absolute inset-0 z-30" onClick={() => setShowEmojiPicker(false)} />
-          <div
-            ref={emojiPickerRef}
-            className="absolute bottom-[88px] left-4 right-4 z-40 rounded-[20px] overflow-hidden shadow-lg"
-            style={{ height: "340px" }}
-          />
-        </>
-      )}
-
-      <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelect} />
-      <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
-
-      <footer className="bg-white p-4 pb-8 flex items-center gap-3 shrink-0 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] z-20">
+      <footer className="bg-white p-4 flex items-center gap-3 shrink-0 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] z-20 h-[63px]">
         <button
-          onClick={() => setShowAttachMenu((prev) => !prev)}
-          className="w-8 h-8 flex items-center justify-center"
+          onClick={() => showAttachMenu ? closeAttachMenu() : setShowAttachMenu(true)}
+          className="w-6 h-6 flex items-center justify-center ml-[15px]"
         >
           <div className="w-6 h-6 bg-[#5745ff]" style={{ maskImage: 'url(/icons/icon-grid.svg)', WebkitMaskImage: 'url(/icons/icon-grid.svg)', maskSize: 'contain', WebkitMaskSize: 'contain' }} />
         </button>
-        <div className="flex-1 h-[48px] bg-[#f2f2f2] rounded-full flex items-center px-5">
+        <div className="flex-1 h-[42px] bg-[#f2f2f2] rounded-full flex items-center px-5">
           <input
             ref={messageInputRef}
             type="text"
@@ -246,10 +190,36 @@ export default function ChatRoomPage() {
             className="w-full bg-transparent text-[14px] font-medium outline-none placeholder-[#979292]"
           />
         </div>
-        <button onClick={handleSend} className="w-8 h-8 flex items-center justify-center">
+        <button onClick={handleSend} className="w-6 h-6 flex items-center justify-center mr-[13px]">
           <div className="w-6 h-6 bg-[#5745ff]" style={{ maskImage: 'url(/icons/icon-send.svg)', WebkitMaskImage: 'url(/icons/icon-send.svg)', maskSize: 'contain', WebkitMaskSize: 'contain' }} />
         </button>
       </footer>
+
+      {showAttachMenu && (
+        <>
+          <div className={`absolute bottom-[63px] left-0 right-0 z-40 bg-white rounded-t-[20px] ${isClosing ? 'animate-slide-down' : 'animate-slide-up'}`}>
+            <button 
+              onClick = {closeAttachMenu}
+              className="flex justify-center w-full pt-3 pb-2">
+              <div 
+                className="w-6 h-6 bg-gray-400"
+                style={{ maskImage: 'url(/icons/keyboard-arrow-down.svg)', WebkitMaskImage: 'url(/icons/keyboard-arrow-down.svg)', maskSize: 'contain', WebkitMaskSize: 'contain' }}
+              />
+            </button>
+
+            <div className="px-6 pb-4">
+              <p className="text-[12px] text-[#959595] font-medium mb-3">자주 묻는 질문 Top</p>
+              <div className="flex flex-col gap-3">
+                <button className="text-left text-[15px] font-bold text-black">자주 묻는 질문 1</button>
+                <button className="text-left text-[15px] font-bold text-black">자주 묻는 질문 2</button>
+                <button className="text-left text-[15px] font-bold text-black">자주 묻는 질문 3</button>
+              </div>
+            </div>
+
+            <Navbar relative={true} />
+          </div>
+        </>
+      )}
     </main>
   );
 }

@@ -3,14 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export default function Navbar() {
+export default function Navbar({relative = false}: {relative?: boolean}) {
   const pathname = usePathname();
 
   // 상세 채팅방이거나 로그인, 회원가입 페이지일 때 Navbar 숨김
   const isChatRoom = pathname.startsWith('/chat/') && pathname !== '/chat/';
   const isAuthPage = pathname === '/login' || pathname === '/signup';
   
-  if (isChatRoom || isAuthPage) {
+  if (!relative && (isChatRoom || isAuthPage)) {
     return null;
   }
 
@@ -22,7 +22,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="absolute bottom-0 left-0 w-full h-[67px] bg-white z-50 flex justify-center items-center border-t border-gray-100">
+    <nav className={`${relative ? 'relative':'absolute bottom-0'} left-0 w-full h-[67px] bg-white z-50 flex justify-center items-center border-t border-gray-100`}>
       <div className="flex justify-between w-full max-w-[360px] px-4">
         {menuItems.map((item) => {
           const isActive = pathname === item.path || (item.path === '/chatlog' && pathname.startsWith('/chatlog'));
