@@ -7,7 +7,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   // 상세 채팅방이거나 로그인, 회원가입 페이지일 때 Navbar 숨김
-  const isChatRoom = pathname.startsWith('/chat/') && pathname !== '/chat';
+  const isChatRoom = pathname.startsWith('/chat/') && pathname !== '/chat/';
   const isAuthPage = pathname === '/login' || pathname === '/signup';
   
   if (isChatRoom || isAuthPage) {
@@ -16,7 +16,7 @@ export default function Navbar() {
 
   const menuItems = [
     { name: '홈', path: '/', icon: '/icons/nav-home.svg', isExternal: false },
-    { name: '대화', path: '/chat', icon: '/icons/nav-chat.svg', isExternal: false },
+    { name: '대화', path: '/chatlog', icon: '/icons/nav-chat.svg', isExternal: false },
     { name: '이용가이드', path: 'https://docs.riido.io', icon: '/icons/nav-guide.svg', isExternal: true },
     { name: '설정', path: '/settings', icon: '/icons/nav-settings.svg', isExternal: false },
   ];
@@ -25,7 +25,7 @@ export default function Navbar() {
     <nav className="absolute bottom-0 left-0 w-full h-[67px] bg-white z-50 flex justify-center items-center border-t border-gray-100">
       <div className="flex justify-between w-full max-w-[360px] px-4">
         {menuItems.map((item) => {
-          const isActive = pathname === item.path || (item.path === '/chat' && pathname.startsWith('/chat'));
+          const isActive = pathname === item.path || (item.path === '/chatlog' && pathname.startsWith('/chatlog'));
           
           const content = (
             <div className="flex flex-col items-center justify-center w-[70px] cursor-pointer">

@@ -33,7 +33,7 @@ export default function ChatRoomPage() {
         if (token) headers.Authorization = `Bearer ${token}`;
 
         if (params.id === "new") {
-          const res = await api.post("/chat/session", {}, { headers });
+          const res = await api.post("/sessions", {}, { headers });
           const newSessionId = res.data.data.sessionId;
           setSessionId(newSessionId);
           router.replace(`/chat/${newSessionId}`);
@@ -41,7 +41,7 @@ export default function ChatRoomPage() {
           setSessionId(params.id as string);
         }
       } catch {
-        router.replace("/chat");
+        router.replace("/chatlog");
       }
     };
     initSession();

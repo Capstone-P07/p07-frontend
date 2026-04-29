@@ -3,8 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-const PUBLIC_PATHS = ["/login", "/signup"];
-const ADMIN_PATHS = ["/admin"];
+const LOGIN_REQUIRED_PATHS = ["/chatlog", "/settings"];
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -12,10 +11,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    const isPublic = PUBLIC_PATHS.includes(pathname);
-    const isAdmin = pathname.startsWith("/admin");
+    const isLoginRequired = LOGIN_REQUIRED_PATHS.some(path => pathname.startsWith(path));
 
-    if (!token && !isPublic && !isAdmin) { //admin 페이지 로그인 생략
+    if (!token && isLoginRequired) {
       router.replace("/login");
     }
   }, [pathname, router]);
