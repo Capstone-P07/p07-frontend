@@ -138,7 +138,9 @@ export default function ChatRoomPage() {
           <h1 className="text-[18px] font-bold text-black tracking-tight flex items-center h-full">뤼이도 Riido</h1>
         </div>
         <div className="w-10 h-10 flex items-center justify-center mr-1">
-          <div className="w-8 h-8 bg-[#959595]" style={{ maskImage: 'url(/icons/icon-profile.svg)', WebkitMaskImage: 'url(/icons/icon-profile.svg)', maskSize: 'contain', WebkitMaskSize: 'contain' }} />
+          <div className="w-8 h-8 bg-[#959595]" 
+            style={{ maskImage: 'url(/icons/icon-profile.svg)', WebkitMaskImage: 'url(/icons/icon-profile.svg)', maskSize: 'contain', WebkitMaskSize: 'contain' }} 
+            onClick={() => router.push(`/login?redirect=/chat/${sessionId}`)} />
         </div>
       </header>
 

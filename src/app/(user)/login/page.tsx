@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,7 +21,17 @@ export default function LoginPage() {
       const res = await api.post("/auth/login", { email, password });
       const { accessToken } = res.data.data;
       localStorage.setItem("accessToken", accessToken);
-      router.push("/");
+
+      if (redirect?.startsWith("/chat/")) {
+        const sessionId = redirect.split("/chat/")[1];
+        if (sessionId && sessionId !== "new") {
+          await api.patch(`/sessions/${sessionId}`, {}, {
+            headers: { Authorization: `Bearer ${accessToken}` }
+          });
+        }
+      }
+
+      router.push(redirect ?? "/");
     } catch (err: any) {
       if (err.response?.status === 401) {
         setError("이메일 또는 비밀번호가 올바르지 않습니다.");
