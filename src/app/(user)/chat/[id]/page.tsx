@@ -196,8 +196,13 @@ export default function ChatRoomPage() {
             className="w-full bg-transparent text-[14px] font-medium outline-none placeholder-[#979292]"
           />
         </div>
-        <button onClick={handleSend} className="w-6 h-6 flex items-center justify-center mr-[13px]">
-          <div className="w-6 h-6 bg-[#5745ff]" style={{ maskImage: 'url(/icons/icon-send.svg)', WebkitMaskImage: 'url(/icons/icon-send.svg)', maskSize: 'contain', WebkitMaskSize: 'contain' }} />
+        <button 
+          onClick={handleSend} 
+          disabled = {isStreaming}
+          className="w-6 h-6 flex items-center justify-center mr-[13px]">
+          <div 
+            className={`w-6 h-6 ${isStreaming ? 'bg-gray-300' : 'bg-[#5745ff]'}`} 
+            style={{ maskImage: 'url(/icons/icon-send.svg)', WebkitMaskImage: 'url(/icons/icon-send.svg)', maskSize: 'contain', WebkitMaskSize: 'contain' }} />
         </button>
       </footer>
 
