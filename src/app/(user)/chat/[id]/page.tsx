@@ -21,6 +21,7 @@ export default function ChatRoomPage() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [faqs, setFaqs] = useState<string[]>([]);
   const messageInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
@@ -48,14 +49,28 @@ export default function ChatRoomPage() {
   }, [params.id, router]);
 
   useEffect(() => {
+    const fetchFaqs = async () => {
+      try {
+        const res = await api.get('/search/faq?limit=3');
+        const questions = res.data.data.faqs.map((f: any) => f.question);
+        setFaqs(questions);
+      } catch {
+        setFaqs([]); // 실패해도 빈 배열로 처리
+      }
+    };
+    fetchFaqs();
+  }, []);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
 
-  const handleSend = async () => {
-    if (!message.trim() || !sessionId || isStreaming) return;
-
-    const userMessage = message.trim();
+  const handleSend = async (directMessage?: string) => {
+    
+    const userMessage = directMessage?.trim() || message.trim();
+    if (!userMessage || !sessionId || isStreaming) return;
+    
     setMessage("");
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setIsStreaming(true);
@@ -129,6 +144,7 @@ export default function ChatRoomPage() {
     }, 300);
   };
 
+
   return (
     <main className="relative w-[400px] h-[760px] bg-[#f0f0ff] font-sans flex flex-col">
       <header className="bg-white px-4 py-3 flex items-center justify-between border-b border-gray-100 z-20 h-[70px] shrink-0">
@@ -197,7 +213,7 @@ export default function ChatRoomPage() {
           />
         </div>
         <button 
-          onClick={handleSend} 
+          onClick={ () => handleSend() } 
           disabled = {isStreaming}
           className="w-6 h-6 flex items-center justify-center mr-[13px]">
           <div 
@@ -221,9 +237,18 @@ export default function ChatRoomPage() {
             <div className="px-6 pb-4">
               <p className="text-[12px] text-[#959595] font-medium mb-3">자주 묻는 질문 Top</p>
               <div className="flex flex-col gap-3">
-                <button className="text-left text-[15px] font-bold text-black">자주 묻는 질문 1</button>
-                <button className="text-left text-[15px] font-bold text-black">자주 묻는 질문 2</button>
-                <button className="text-left text-[15px] font-bold text-black">자주 묻는 질문 3</button>
+                {faqs.map((faq, i) => (
+                  <button
+                    key={i}
+                    className="text-left text-[15px] font-bold text-black"
+                    onClick={() => {
+                      closeAttachMenu();     // 메뉴 닫기
+                      handleSend(faq);       // 클릭시 질문 전송
+                    }}
+                  >
+                    {faq}
+                  </button>
+                ))}
               </div>
             </div>
 
