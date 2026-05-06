@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import api from "@/lib/api";
 import Navbar from "@/components/Navbar";
+import { parseFallbackField } from "next/dist/lib/fallback";
 
 interface Message {
   role: "user" | "assistant";
@@ -62,12 +63,11 @@ export default function ChatRoomPage() {
     try {
       const token = localStorage.getItem("accessToken");
       const headers: any = {
-        "x-session-id": sessionId,
         Accept: "text/event-stream",
       };
       if (token) headers.Authorization = `Bearer ${token}`;
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/message`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/message/${sessionId}`, {
         method: "POST",
         headers: { ...headers, "Content-Type": "application/json" },
         body: JSON.stringify({ question: userMessage }),
@@ -89,16 +89,20 @@ export default function ChatRoomPage() {
         for (const line of lines) {
           if (line.startsWith("data: ")) {
             const data = line.replace("data: ", "").trim();
-            if (data === "[DONE]") break;
+            if (!data) continue;
             try {
               const parsed = JSON.parse(data);
-              if (parsed.content) {
-                assistantMessage += parsed.content;
+              if (parsed.type === 'chunk' && parsed.text) {
+                assistantMessage += parsed.text;
                 setMessages((prev) => {
                   const updated = [...prev];
                   updated[updated.length - 1] = { role: "assistant", content: assistantMessage };
                   return updated;
                 });
+              }
+
+              if(parsed.type === 'done'){
+                break;
               }
             } catch {}
           }
