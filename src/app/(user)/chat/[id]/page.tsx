@@ -46,6 +46,14 @@ export default function ChatRoomPage() {
           router.replace(`/chat/${newSessionId}`);
         } else {
           setSessionId(params.id as string);
+
+          //이전 대화 내용 불러오기
+          const res = await api.get(`/logs/chat?sessionId=${params.id}`, { headers });
+          const logs = res.data.data.logs;
+          setMessages(logs.map((log: any) => ({
+            role: log.role,
+            content: log.content,
+          })));
         }
       } catch {
         router.replace("/chatlog");
@@ -154,6 +162,13 @@ export default function ChatRoomPage() {
     }, 300);
   };
 
+  const RECOMMENDED_QUESTIONS = [
+    "멤버를 초대하려면 어떻게 하나요?",
+    "스프린트는 어떻게 시작하나요?",
+    "깃허브 연동은 어떻게 하나요?",
+    "작업 상태는 어떻게 변경하나요?",
+    "미팅은 어떻게 시작하나요?",
+  ];
 
   return (
     <main className="relative w-[400px] h-[760px] bg-[#f0f0ff] font-sans flex flex-col">
@@ -176,11 +191,24 @@ export default function ChatRoomPage() {
 
       <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-4">
         {messages.length === 0 && (
-          <div className="bg-white rounded-tr-[30px] rounded-br-[30px] rounded-bl-[30px] p-6 shadow-sm w-[310px]">
-            <p className="text-[14px] leading-relaxed text-[#3a3a3a] font-medium">
-              사용 중 궁금한 점이 있으신가요? 언제든지 질문 해주세요 😉
-            </p>
-          </div>
+          <>
+            <div className="bg-white rounded-tr-[30px] rounded-br-[30px] rounded-bl-[30px] p-6 shadow-sm w-[310px]">
+              <p className="text-[14px] leading-relaxed text-[#3a3a3a] font-medium">
+                사용 중 궁금한 점이 있으신가요? 언제든지 질문 해주세요 😉
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {RECOMMENDED_QUESTIONS.map((q, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSend(q)}
+                  className="bg-white text-[#5745ff] text-[12px] font-medium px-4 py-2 rounded-full shadow-sm border border-[#5745ff] hover:bg-[#5745ff] hover:text-white transition-colors"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          </>
         )}
 
         {messages.map((msg, i) => (
