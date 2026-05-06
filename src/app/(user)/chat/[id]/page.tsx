@@ -5,11 +5,17 @@ import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import api from "@/lib/api";
 import Navbar from "@/components/Navbar";
-import { parseFallbackField } from "next/dist/lib/fallback";
+
+interface Reference {
+  title: string;
+  url: string;
+  section: string;
+}
 
 interface Message {
   role: "user" | "assistant";
   content: string;
+  references?:Reference[];
 }
 
 export default function ChatRoomPage() {
@@ -117,6 +123,16 @@ export default function ChatRoomPage() {
               }
 
               if(parsed.type === 'done'){
+                if(parsed.references?.length > 0){
+                  setMessages((prev) => {
+                    const updated = [...prev];
+                    updated[updated.length - 1] = {
+                      ...updated[updated.length - 1],
+                      references: parsed.references,
+                    };
+                    return updated;
+                  });
+                }
                 break;
               }
             } catch {}
@@ -128,12 +144,6 @@ export default function ChatRoomPage() {
     } finally {
       setIsStreaming(false);
     }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) console.log("파일 선택:", file.name);
-    setShowAttachMenu(false);
   };
 
   const closeAttachMenu = () => {
@@ -187,6 +197,24 @@ export default function ChatRoomPage() {
                     <span className="inline-block w-1 h-4 bg-gray-400 animate-pulse ml-1" />
                   )}
                 </p>
+                {msg.references && msg.references.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <p className="text-[11px] text-[#959595] font-medium mb-2">참고 문서</p>
+                    <div className="flex flex-col gap-1">
+                      {msg.references.map((ref,j) => (
+                        <a
+                          key={j}
+                          href={ref.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[12px] text-[#5745ff] font-medium hover:underline truncate"
+                        >
+                          📄 {ref.section ?? ref.title}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
