@@ -6,9 +6,16 @@ import { useRouter, useParams } from "next/navigation";
 import api from "@/lib/api";
 import Navbar from "@/components/Navbar";
 
+interface Reference {
+  title: string;
+  url: string;
+  section: string;
+}
+
 interface Message {
   role: "user" | "assistant";
   content: string;
+  references?:Reference[];
 }
 
 export default function ChatRoomPage() {
@@ -20,6 +27,7 @@ export default function ChatRoomPage() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [faqs, setFaqs] = useState<string[]>([]);
   const messageInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
@@ -38,6 +46,14 @@ export default function ChatRoomPage() {
           router.replace(`/chat/${newSessionId}`);
         } else {
           setSessionId(params.id as string);
+
+          //이전 대화 내용 불러오기
+          const res = await api.get(`/logs/chat?sessionId=${params.id}`, { headers });
+          const logs = res.data.data.logs;
+          setMessages(logs.map((log: any) => ({
+            role: log.role,
+            content: log.content,
+          })));
         }
       } catch {
         router.replace("/chatlog");
@@ -47,14 +63,28 @@ export default function ChatRoomPage() {
   }, [params.id, router]);
 
   useEffect(() => {
+    const fetchFaqs = async () => {
+      try {
+        const res = await api.get('/search/faq?limit=3');
+        const questions = res.data.data.faqs.map((f: any) => f.question);
+        setFaqs(questions);
+      } catch {
+        setFaqs([]); // 실패해도 빈 배열로 처리
+      }
+    };
+    fetchFaqs();
+  }, []);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
 
-  const handleSend = async () => {
-    if (!message.trim() || !sessionId || isStreaming) return;
-
-    const userMessage = message.trim();
+  const handleSend = async (directMessage?: string) => {
+    
+    const userMessage = directMessage?.trim() || message.trim();
+    if (!userMessage || !sessionId || isStreaming) return;
+    
     setMessage("");
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setIsStreaming(true);
@@ -62,12 +92,11 @@ export default function ChatRoomPage() {
     try {
       const token = localStorage.getItem("accessToken");
       const headers: any = {
-        "x-session-id": sessionId,
         Accept: "text/event-stream",
       };
       if (token) headers.Authorization = `Bearer ${token}`;
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/message`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/message/${sessionId}`, {
         method: "POST",
         headers: { ...headers, "Content-Type": "application/json" },
         body: JSON.stringify({ question: userMessage }),
@@ -89,16 +118,30 @@ export default function ChatRoomPage() {
         for (const line of lines) {
           if (line.startsWith("data: ")) {
             const data = line.replace("data: ", "").trim();
-            if (data === "[DONE]") break;
+            if (!data) continue;
             try {
               const parsed = JSON.parse(data);
-              if (parsed.content) {
-                assistantMessage += parsed.content;
+              if (parsed.type === 'chunk' && parsed.text) {
+                assistantMessage += parsed.text;
                 setMessages((prev) => {
                   const updated = [...prev];
                   updated[updated.length - 1] = { role: "assistant", content: assistantMessage };
                   return updated;
                 });
+              }
+
+              if(parsed.type === 'done'){
+                if(parsed.references?.length > 0){
+                  setMessages((prev) => {
+                    const updated = [...prev];
+                    updated[updated.length - 1] = {
+                      ...updated[updated.length - 1],
+                      references: parsed.references,
+                    };
+                    return updated;
+                  });
+                }
+                break;
               }
             } catch {}
           }
@@ -111,12 +154,6 @@ export default function ChatRoomPage() {
     }
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) console.log("파일 선택:", file.name);
-    setShowAttachMenu(false);
-  };
-
   const closeAttachMenu = () => {
     setIsClosing(true);
     setTimeout(() => {
@@ -124,6 +161,14 @@ export default function ChatRoomPage() {
       setIsClosing(false);
     }, 300);
   };
+
+  const RECOMMENDED_QUESTIONS = [
+    "멤버를 초대하려면 어떻게 하나요?",
+    "스프린트는 어떻게 시작하나요?",
+    "깃허브 연동은 어떻게 하나요?",
+    "작업 상태는 어떻게 변경하나요?",
+    "미팅은 어떻게 시작하나요?",
+  ];
 
   return (
     <main className="relative w-[400px] h-[760px] bg-[#f0f0ff] font-sans flex flex-col">
@@ -146,11 +191,24 @@ export default function ChatRoomPage() {
 
       <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-4">
         {messages.length === 0 && (
-          <div className="bg-white rounded-tr-[30px] rounded-br-[30px] rounded-bl-[30px] p-6 shadow-sm w-[310px]">
-            <p className="text-[14px] leading-relaxed text-[#3a3a3a] font-medium">
-              사용 중 궁금한 점이 있으신가요? 언제든지 질문 해주세요 😉
-            </p>
-          </div>
+          <>
+            <div className="bg-white rounded-tr-[30px] rounded-br-[30px] rounded-bl-[30px] p-6 shadow-sm w-[310px]">
+              <p className="text-[14px] leading-relaxed text-[#3a3a3a] font-medium">
+                사용 중 궁금한 점이 있으신가요? 언제든지 질문 해주세요 😉
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {RECOMMENDED_QUESTIONS.map((q, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSend(q)}
+                  className="bg-white text-[#5745ff] text-[12px] font-medium px-4 py-2 rounded-full shadow-sm border border-[#5745ff] hover:bg-[#5745ff] hover:text-white transition-colors"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          </>
         )}
 
         {messages.map((msg, i) => (
@@ -167,6 +225,24 @@ export default function ChatRoomPage() {
                     <span className="inline-block w-1 h-4 bg-gray-400 animate-pulse ml-1" />
                   )}
                 </p>
+                {msg.references && msg.references.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <p className="text-[11px] text-[#959595] font-medium mb-2">참고 문서</p>
+                    <div className="flex flex-col gap-1">
+                      {msg.references.map((ref,j) => (
+                        <a
+                          key={j}
+                          href={ref.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[12px] text-[#5745ff] font-medium hover:underline truncate"
+                        >
+                          📄 {ref.section ?? ref.title}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -192,8 +268,13 @@ export default function ChatRoomPage() {
             className="w-full bg-transparent text-[14px] font-medium outline-none placeholder-[#979292]"
           />
         </div>
-        <button onClick={handleSend} className="w-6 h-6 flex items-center justify-center mr-[13px]">
-          <div className="w-6 h-6 bg-[#5745ff]" style={{ maskImage: 'url(/icons/icon-send.svg)', WebkitMaskImage: 'url(/icons/icon-send.svg)', maskSize: 'contain', WebkitMaskSize: 'contain' }} />
+        <button 
+          onClick={ () => handleSend() } 
+          disabled = {isStreaming}
+          className="w-6 h-6 flex items-center justify-center mr-[13px]">
+          <div 
+            className={`w-6 h-6 ${isStreaming ? 'bg-gray-300' : 'bg-[#5745ff]'}`} 
+            style={{ maskImage: 'url(/icons/icon-send.svg)', WebkitMaskImage: 'url(/icons/icon-send.svg)', maskSize: 'contain', WebkitMaskSize: 'contain' }} />
         </button>
       </footer>
 
@@ -212,9 +293,18 @@ export default function ChatRoomPage() {
             <div className="px-6 pb-4">
               <p className="text-[12px] text-[#959595] font-medium mb-3">자주 묻는 질문 Top</p>
               <div className="flex flex-col gap-3">
-                <button className="text-left text-[15px] font-bold text-black">자주 묻는 질문 1</button>
-                <button className="text-left text-[15px] font-bold text-black">자주 묻는 질문 2</button>
-                <button className="text-left text-[15px] font-bold text-black">자주 묻는 질문 3</button>
+                {faqs.map((faq, i) => (
+                  <button
+                    key={i}
+                    className="text-left text-[15px] font-bold text-black"
+                    onClick={() => {
+                      closeAttachMenu();     // 메뉴 닫기
+                      handleSend(faq);       // 클릭시 질문 전송
+                    }}
+                  >
+                    {faq}
+                  </button>
+                ))}
               </div>
             </div>
 

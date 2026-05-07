@@ -7,10 +7,10 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 
 interface ChatSession {
-  id: string;
-  title: string;
-  lastMessage: string;
-  time: string;
+  sessionId: string;
+  startedAt: string;
+  messageCount: string;
+  preview: string;
 }
 
 export default function ChatLogPage() {
@@ -24,7 +24,7 @@ export default function ChatLogPage() {
         const res = await api.get("/logs/chat/history", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setChatSessions(res.data.data);
+        setChatSessions(res.data.data.sessions);
       } catch {
         setChatSessions([]);
       }
@@ -38,19 +38,19 @@ export default function ChatLogPage() {
         <h1 className="text-[22px] font-bold text-black tracking-tight">대화</h1>
       </header>
 
-      <div className="px-[25px]">
+      <div className="px-[25px] overflow-y-auto h-[calc(100%-170px)]">
         {chatSessions.map((chat) => (
-          <Link href={`/chat/${chat.id}`} key={chat.id}>
+          <Link href={`/chat/${chat.sessionId}`} key={chat.sessionId}>
             <div className="flex items-start gap-3 py-4">
               <div className="relative w-11 h-11 flex-shrink-0">
                 <Image src="/logo.svg" alt="Riido" fill className="object-contain" />
               </div>
               <div className="flex flex-col gap-0.5">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-[15px] text-black">{chat.title || "뤼이도 Riido"}</span>
-                  <span className="text-[12px] text-[#959595] font-light">{chat.time}</span>
+                  <span className="font-bold text-[15px] text-black">{"뤼이도 Riido"}</span>
+                  <span className="text-[12px] text-[#959595] font-light">{new Date(chat.startedAt).toLocaleDateString('ko-KR')}</span>
                 </div>
-                <p className="text-[14px] text-[#3a3a3a] font-medium">{chat.lastMessage}</p>
+                <p className="text-[14px] text-[#3a3a3a] font-medium">{chat.preview || "대화 내용 없음"}</p>
               </div>
             </div>
           </Link>
