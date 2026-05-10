@@ -30,12 +30,13 @@ export default function Home() {
         </div>
         
         <p className="absolute top-[40px] left-[46px] w-[282px] font-medium text-[#3a3a3a] text-[14px] leading-[1.3] break-keep pr-2">
-          연락처를 남겨주세요. 오프라인 상태가 되면 문자(알림톡) 및 이메일로 답변 알림을 보내드려요....
+          사용 중 궁금한 점이 있으신가요? 언제든지 질문 해주세요 😉 <br/>
+          📄Riido 이용가이드 기반으로 답변해요
         </p>
 
         <div 
           onClick ={() => router.push("/chat/new")}
-          className="absolute top-[88px] left-[19px] w-[311px] h-[50px] bg-[#f2f2f2] rounded-[15px] flex items-center overflow-hidden">
+          className="absolute top-[115px] left-[19px] w-[311px] h-[50px] bg-[#f2f2f2] rounded-[15px] flex items-center overflow-hidden">
           <input 
             type="text"
             value={message}
@@ -44,15 +45,6 @@ export default function Home() {
             className="w-full h-full bg-transparent px-[18px] text-sm font-medium text-black placeholder-[#979292] outline-none border-none"
           />
         </div>
-
-        <div className="absolute top-[158px] left-0 w-full flex justify-center items-center gap-[4px] h-4">
-          <div className="relative w-[14px] h-[14px] flex items-center">
-            <Image src="/icons/Clock.svg" alt="Clock" fill className="opacity-40 object-contain" />
-          </div>
-          <span className="font-semibold text-[#676666] text-[12px] leading-none flex items-center translate-y-[0.5px]">
-            내일 오전 11:00부터 운영해요
-          </span>
-        </div>
       </div>
 
       <div className="absolute top-[308px] left-0 w-full flex justify-center items-center gap-[4px] h-5">
@@ -60,8 +52,7 @@ export default function Home() {
           <Image src="/icons/channel talk.svg" alt="Talk" fill className="object-contain" />
         </div>
         <div className="text-[#7b7777] text-[10px] flex items-center leading-none translate-y-[0.5px]">
-          <span className="font-semibold mr-[4px]">채널톡</span>
-          <span className="font-light">이용중</span>
+          <span className="font-light">모든 답변에 문서 근거를 함께 제공해요</span>
         </div>
       </div>
     </main>

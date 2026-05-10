@@ -28,10 +28,10 @@ export default function Navbar({relative = false}: {relative?: boolean}) {
           const isActive = pathname === item.path || (item.path === '/chatlog' && pathname.startsWith('/chatlog'));
           
           const content = (
-            <div className="flex flex-col items-center justify-center w-[70px] cursor-pointer">
+            <div className="group flex flex-col items-center justify-center w-[70px] cursor-pointer">
               <div className="relative w-7 h-7 mb-1 flex items-center justify-center">
                 <div 
-                  className={`w-7 h-7 ${isActive ? 'bg-[#5745ff]' : 'bg-[#959595]'}`}
+                  className={`w-7 h-7 transition-colors ${isActive ? 'bg-[#5745ff]' : 'bg-[#959595] group-hover:bg-[#5745ff]'}`}
                   style={{ 
                     maskImage: `url(${item.icon})`, 
                     WebkitMaskImage: `url(${item.icon})`, 
@@ -42,7 +42,7 @@ export default function Navbar({relative = false}: {relative?: boolean}) {
                   }}
                 />
               </div>
-              <span className={`w-full text-center text-[12px] font-medium leading-none tracking-tighter ${isActive ? 'text-[#5745ff]' : 'text-[#959595]'}`}>
+              <span className={`w-full text-center text-[12px] font-medium leading-none tracking-tighter ${isActive ? 'text-[#5745ff]' : 'text-[#959595] group-hover:text-[#5745ff]'}`}>
                 {item.name}
               </span>
             </div>
