@@ -7,17 +7,17 @@ interface Envelope<T> {
   error: { code: string; message: string } | null;
 }
 
-export async function getStatsOverview(): Promise<StatsOverview> {
-  const res = await api.get<Envelope<StatsOverview>>('/admin/stats/overview');
+export async function getStatsOverview(period = '7d'): Promise<StatsOverview> {
+  const res = await api.get<Envelope<StatsOverview>>(`/admin/stats/overview?period=${period}`);
   return res.data.data;
 }
 
-export async function getTopQueries(limit = 5): Promise<TopQuery[]> {
-  const res = await api.get<Envelope<TopQuery[]>>(`/admin/stats/top-queries?limit=${limit}`);
+export async function getTopQueries(limit = 5, period = '7d'): Promise<TopQuery[]> {
+  const res = await api.get<Envelope<TopQuery[]>>(`/admin/stats/top-queries?limit=${limit}&period=${period}`);
   return res.data.data;
 }
 
-export async function getSatisfactionStats(): Promise<SatisfactionStats> {
-  const res = await api.get<Envelope<SatisfactionStats>>('/admin/stats/satisfaction');
+export async function getSatisfactionStats(period = '7d'): Promise<SatisfactionStats> {
+  const res = await api.get<Envelope<SatisfactionStats>>(`/admin/stats/satisfaction?period=${period}`);
   return res.data.data;
 }

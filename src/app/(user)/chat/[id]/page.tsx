@@ -84,10 +84,12 @@ export default function ChatRoomPage() {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const logs = res.data.data?.logs ?? [];
-      setMessages(logs.map((log: any) => ({
+      setMessages((prev) =>
+        logs.map((log: any, i:number) => ({
         role: log.role,
         content: log.content,
         logId: log.logId,
+        references: prev[i]?.references,
       })));
     } catch {}
   };
@@ -141,6 +143,7 @@ export default function ChatRoomPage() {
     try {
       const token = localStorage.getItem("accessToken");
       const headers: any = {
+        "Content-Type": "application/json",
         Accept: "text/event-stream",
       };
       if (token) headers.Authorization = `Bearer ${token}`;
