@@ -113,7 +113,7 @@ export default function DocumentDetailPanel({ document, isOpen, onClose, onMutat
                     <input
                       type="text"
                       readOnly
-                      className="flex-1 block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300 bg-gray-50"
+                      className="flex-1 block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300 bg-gray-50 text-gray-500"
                       value={document.sourceUrl}
                     />
                   </div>

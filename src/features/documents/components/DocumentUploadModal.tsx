@@ -14,6 +14,7 @@ export default function DocumentUploadModal({ isOpen, onClose, onUploaded }: Doc
 
   const [title, setTitle] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [url, setUrl] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -21,6 +22,7 @@ export default function DocumentUploadModal({ isOpen, onClose, onUploaded }: Doc
   const reset = () => {
     setTitle('');
     setFile(null);
+    setUrl('');
     setLocalError(null);
   };
 
@@ -56,7 +58,7 @@ export default function DocumentUploadModal({ isOpen, onClose, onUploaded }: Doc
       return;
     }
     try {
-      await upload({ source: 'file', file, title: title || undefined });
+      await upload({ source: 'file', file, title: title || undefined, url:url || undefined });
       onUploaded?.();
       reset();
       onClose();
@@ -89,8 +91,19 @@ export default function DocumentUploadModal({ isOpen, onClose, onUploaded }: Doc
                       type="text"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
                       placeholder="비워두면 파일에서 첫 H1을 사용합니다"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">원본 문서 URL (선택)</label>
+                    <input
+                      type="url"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                      placeholder="https://docs.riido.io/..."
                     />
                   </div>
 

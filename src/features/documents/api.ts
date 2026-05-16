@@ -74,7 +74,7 @@ export async function uploadDocument(
   fd.append("source", payload.source);
   if (payload.title) fd.append("title", payload.title);
   if (payload.source === "file" && payload.file) fd.append("file", payload.file);
-  if (payload.source === "url" && payload.url) fd.append("url", payload.url);
+  if (payload.url) fd.append("url", payload.url);
 
   // 주의: Content-Type 을 명시하지 않는다 — axios 가 FormData 를 인식하면
   // boundary 가 포함된 `multipart/form-data; boundary=...` 를 자동 설정한다.
