@@ -144,15 +144,13 @@ export default function ChatRoomPage() {
     try {
       const token = localStorage.getItem("accessToken");
       const headers: any = {
-        "Content-Type": "application/json",
         Accept: "text/event-stream",
       };
       if (token) headers.Authorization = `Bearer ${token}`;
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/message/${sessionId}`, {
-        method: "POST",
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/message/${sessionId}?question=${encodeURIComponent(userMessage)}`, {
+        method: "GET",
         headers,
-        body: JSON.stringify({ question: userMessage }),
       });
 
       const reader = response.body?.getReader();
