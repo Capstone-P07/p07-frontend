@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import api from "@/lib/api";
 import Navbar from "@/components/Navbar";
+import ReactMarkdown from 'react-markdown';
 
 interface Reference {
   title: string;
@@ -193,6 +194,7 @@ export default function ChatRoomPage() {
                     return updated;
                   });
                 }
+                if (sessionId) await fetchLogs(sessionId);
                 break;
               }
             } catch {}
@@ -204,7 +206,6 @@ export default function ChatRoomPage() {
     } finally {
       setIsStreaming(false);
       messageInputRef.current?.focus();
-      if (sessionId) await fetchLogs(sessionId);
     }
   };
 
@@ -306,12 +307,14 @@ export default function ChatRoomPage() {
             ) : (
               <div className="flex flex-col gap-2">
                 <div className="bg-white rounded-tr-[30px] rounded-br-[30px] rounded-bl-[30px] p-6 shadow-sm max-w-[310px]">
-                  <p className="text-[14px] leading-relaxed text-[#3a3a3a] font-medium">
-                    {msg.content}
+                  <div className="text-[14px] leading-relaxed text-[#3a3a3a] font-medium">
+                    <ReactMarkdown>
+                      {msg.content}
+                    </ReactMarkdown>
                     {isStreaming && i === messages.length - 1 && (
                       <span className="inline-block w-1 h-4 bg-gray-400 animate-pulse ml-1" />
                     )}
-                  </p>
+                  </div>
                   {msg.references && msg.references.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-gray-100">
                     <p className="text-[11px] text-[#959595] font-medium mb-2">참고 문서</p>
@@ -428,7 +431,7 @@ export default function ChatRoomPage() {
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="메세지를 입력하세요."
-            className="w-full bg-transparent text-[14px] font-medium outline-none placeholder-[#979292]"
+            className="w-full bg-transparent text-[14px] font-medium outline-none placeholder-[#979292] text-black"
           />
         </div>
         <button 
@@ -460,7 +463,7 @@ export default function ChatRoomPage() {
                     key={i}
                     className="text-left text-[15px] font-bold text-black"
                     onClick={() => {
-                      closeAttachMenu();     // 메뉴 닫기
+                      setShowAttachMenu(false);     // 메뉴 닫기
                       handleSend(faq);       // 클릭시 질문 전송
                     }}
                   >
