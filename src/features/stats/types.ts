@@ -35,7 +35,7 @@ export interface CategoryItem {
   color: string;
 }
 
-// 일별 질문 수 추이용 (mock or future BE endpoint)
+// 일별 질문 수 추이용 데이터. 백엔드 일별 질문 API가 생기면 실제 응답으로 교체한다.
 export interface DailyQueryStat {
   date: string;
   success: number;

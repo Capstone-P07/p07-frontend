@@ -2,14 +2,14 @@ import type { StatsPeriod } from '../types';
 
 const TABS: { label: string; value: StatsPeriod }[] = [
   { label: '오늘', value: 'today' },
-  { label: '7일',  value: '7d' },
+  { label: '7일', value: '7d' },
   { label: '30일', value: '30d' },
   { label: '전체', value: 'all' },
 ];
 
 interface Props {
   value: StatsPeriod;
-  onChange: (p: StatsPeriod) => void;
+  onChange: (period: StatsPeriod) => void;
 }
 
 export default function PeriodTabs({ value, onChange }: Props) {
