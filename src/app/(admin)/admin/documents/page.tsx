@@ -75,12 +75,15 @@ export default function DocumentsPage() {
           onUploaded={handleListMutated}
         />
 
-        <DocumentDetailPanel
-          document={documentDetail}
-          isOpen={!!selectedDocumentId}
-          onClose={handleCloseDetailPanel}
-          onMutated={handleListMutated}
-        />
+        {selectedDocumentId != null && documentDetail && (
+          <DocumentDetailPanel
+            key={documentDetail.id}
+            document={documentDetail}
+            isOpen={true}
+            onClose={handleCloseDetailPanel}
+            onMutated={handleListMutated}
+          />
+        )}
       </div>
     </div>
   );
