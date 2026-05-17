@@ -4,6 +4,11 @@ export function middleware(request: NextRequest) {
   const isAdminDeploy = process.env.NEXT_PUBLIC_DEPLOY_TARGET === 'admin';
   const isAdminPath = request.nextUrl.pathname.startsWith('/admin');
 
+  // admin 배포에서 루트 접속 시 /admin으로 리다이렉트
+  if (isAdminDeploy && request.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/admin', request.url));
+  }
+  
   // user 배포에서 /admin 접근 차단
   if (!isAdminDeploy && isAdminPath) {
     return NextResponse.rewrite(new URL('/404', request.url));
