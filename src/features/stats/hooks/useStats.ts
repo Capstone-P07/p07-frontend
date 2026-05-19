@@ -1,29 +1,52 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { getStatsOverview, getTopQueries, getSatisfactionStats } from '../api';
-import type { StatsOverview, TopQuery, SatisfactionStats, StatsPeriod } from '../types';
-import { Stats } from 'fs';
+import { useCallback, useEffect, useState } from 'react';
+import { getSatisfactionStats, getStatsOverview, getTopQueries } from '../api';
+import type { SatisfactionStats, StatsOverview, StatsPeriod, TopQuery } from '../types';
+
+const LOAD_ERROR_MESSAGE = '데이터를 불러오지 못했습니다.';
 
 export function useStatsOverview(period: StatsPeriod = '7d') {
   const [data, setData] = useState<StatsOverview | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetch = useCallback(async () => {
+  const refetch = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       setData(await getStatsOverview(period));
     } catch {
-      setError('데이터를 불러오지 못했습니다.');
+      setError(LOAD_ERROR_MESSAGE);
     } finally {
       setLoading(false);
     }
   }, [period]);
 
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, error, refetch: fetch };
+  useEffect(() => {
+    let alive = true;
+
+    getStatsOverview(period)
+      .then((overview) => {
+        if (!alive) return;
+        setData(overview);
+        setError(null);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setError(LOAD_ERROR_MESSAGE);
+      })
+      .finally(() => {
+        if (!alive) return;
+        setLoading(false);
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, [period]);
+
+  return { data, loading, error, refetch };
 }
 
 export function useTopQueries(period: StatsPeriod = '7d') {
@@ -31,10 +54,25 @@ export function useTopQueries(period: StatsPeriod = '7d') {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getTopQueries(5,period)
-      .then(setData)
-      .catch(() => setData([]))
-      .finally(() => setLoading(false));
+    let alive = true;
+
+    getTopQueries(5, period)
+      .then((queries) => {
+        if (!alive) return;
+        setData(queries);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setData([]);
+      })
+      .finally(() => {
+        if (!alive) return;
+        setLoading(false);
+      });
+
+    return () => {
+      alive = false;
+    };
   }, [period]);
 
   return { data, loading };
@@ -45,10 +83,25 @@ export function useSatisfactionStats(period: StatsPeriod) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let alive = true;
+
     getSatisfactionStats(period)
-      .then(setData)
-      .catch(() => setData(null))
-      .finally(() => setLoading(false));
+      .then((stats) => {
+        if (!alive) return;
+        setData(stats);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setData(null);
+      })
+      .finally(() => {
+        if (!alive) return;
+        setLoading(false);
+      });
+
+    return () => {
+      alive = false;
+    };
   }, [period]);
 
   return { data, loading };
