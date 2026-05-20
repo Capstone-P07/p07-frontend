@@ -16,7 +16,13 @@ export default function DocumentsPage() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
 
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  
   const { data: documentDetail, refetch: refetchDetail } = useDocumentDetail(selectedDocumentId);
+
+  const filteredDocuments = statusFilter === 'all'
+    ? documents
+    : documents.filter(doc => doc.status === statusFilter);
 
   const handleListMutated = () => {
     void refetchDocuments();
@@ -33,8 +39,8 @@ export default function DocumentsPage() {
     setIsUploadModalOpen(false);
   };
 
-  const handleFilterClick = () => {
-    alert('필터 기능은 아직 구현되지 않았습니다.');
+  const handleFilterChange = (status: string) => {
+    setStatusFilter(status);
   };
 
   const handleRowClick = (doc: DocumentSummary) => {
@@ -46,12 +52,13 @@ export default function DocumentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
         <DocumentPageHeader 
           totalCount={counts.total} 
           onUploadClick={handleUploadClick} 
-          onFilterClick={handleFilterClick} 
+          activeFilter={statusFilter}
+          onFilterChange={handleFilterChange} 
         />
         
         {isLoading ? (
@@ -60,9 +67,13 @@ export default function DocumentsPage() {
           </div>
         ) : (
           <>
-            <StatusStrip counts={counts} />
+            <StatusStrip 
+              counts={counts}
+              activeFilter={statusFilter}
+              onFilterChange={handleFilterChange}
+             />
             <DocumentTable 
-              documents={documents} 
+              documents={filteredDocuments} 
               onUploadClick={handleUploadClick} 
               onRowClick={handleRowClick} 
             />

@@ -176,21 +176,21 @@ export default function DocumentUploadModal({ isOpen, onClose, onUploaded }: Doc
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div className="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={handleClose} />
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-80 transition-opacity" aria-hidden="true" onClick={handleClose} />
         <span className="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
 
-        <div className="inline-block w-full max-w-2xl transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
-          <div className="bg-white px-6 pb-5 pt-6">
+        <div className="inline-block w-full max-w-2xl transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left align-bottom shadow-xl transition-all sm:my-8 sm:align-middle">
+          <div className="bg-white dark:bg-gray-800 px-6 pb-5 pt-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium leading-6 text-gray-900" id="modal-title">문서 등록</h3>
-              <div className="inline-flex rounded-md border border-gray-300 p-1">
+              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white" id="modal-title">문서 등록</h3>
+              <div className="inline-flex rounded-md border border-gray-300 dark:border-gray-600 p-1">
                 {(['file', 'url'] as const).map((value) => (
                   <button
                     key={value}
                     type="button"
                     disabled={isProcessing}
                     className={`rounded px-3 py-1.5 text-sm font-medium ${
-                      mode === value ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50'
+                      mode === value ? 'bg-indigo-600 text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
                     } disabled:opacity-50`}
                     onClick={() => {
                       setMode(value);
@@ -205,13 +205,13 @@ export default function DocumentUploadModal({ isOpen, onClose, onUploaded }: Doc
 
             <div className="mt-5 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">문서 제목 (선택)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">문서 제목 (선택)</label>
                 <input
                   type="text"
                   value={title}
                   disabled={isProcessing}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-50"
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-50 dark:disabled:bg-gray-600"
                   placeholder={mode === 'file' && queue.length > 1 ? '다중 업로드에서는 파일 제목을 사용합니다' : '비워두면 문서의 첫 제목을 사용합니다'}
                 />
               </div>
@@ -219,18 +219,18 @@ export default function DocumentUploadModal({ isOpen, onClose, onUploaded }: Doc
               {mode === 'file' ? (
                 <>
                   <div
-                    className="rounded-md border-2 border-dashed border-gray-300 px-6 py-8 text-center hover:border-indigo-300"
+                    className="rounded-md border-2 border-dashed border-gray-300 dark:border-gray-600 px-6 py-8 text-center hover:border-indigo-300 dark:hover:border-indigo-500"
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={handleDrop}
                   >
-                    <svg className="mx-auto h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="mx-auto h-10 w-10 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M7 16a4 4 0 01.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 12v9m0-9l-3 3m3-3l3 3" />
                     </svg>
-                    <div className="mt-3 text-sm text-gray-600">
+                    <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
                       <button
                         type="button"
                         disabled={isProcessing}
-                        className="font-medium text-indigo-600 hover:text-indigo-500 disabled:opacity-50"
+                        className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 disabled:opacity-50"
                         onClick={() => inputRef.current?.click()}
                       >
                         .md 파일 선택
@@ -245,32 +245,32 @@ export default function DocumentUploadModal({ isOpen, onClose, onUploaded }: Doc
                         onChange={handleFileChange}
                       />
                     </div>
-                    <p className="mt-1 text-xs text-gray-500">파일당 최대 5MB</p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">파일당 최대 5MB</p>
                   </div>
 
                   {queue.length > 0 && (
-                    <div className="overflow-hidden rounded-md border border-gray-200">
-                      <ul className="divide-y divide-gray-200">
+                    <div className="overflow-hidden rounded-md border border-gray-200 dark:border-gray-700">
+                      <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                         {queue.map((item) => (
-                          <li key={item.id} className="flex items-center justify-between gap-4 px-4 py-3">
+                          <li key={item.id} className="flex items-center justify-between gap-4 px-4 py-3 bg-white dark:bg-gray-800">
                             <div className="min-w-0">
-                              <p className="truncate text-sm font-medium text-gray-900">{item.file.name}</p>
-                              {item.message && <p className="mt-1 text-xs text-gray-500">{item.message}</p>}
+                              <p className="truncate text-sm font-medium text-gray-900 dark:text-white">{item.file.name}</p>
+                              {item.message && <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{item.message}</p>}
                             </div>
                             <div className="flex items-center gap-3">
                               <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                item.status === 'done' ? 'bg-green-100 text-green-800' :
-                                item.status === 'failed' ? 'bg-red-100 text-red-800' :
-                                item.status === 'indexing' ? 'bg-blue-100 text-blue-800' :
-                                item.status === 'uploading' ? 'bg-indigo-100 text-indigo-800' :
-                                'bg-gray-100 text-gray-700'
+                                item.status === 'done' ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400' :
+                                item.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-400' :
+                                item.status === 'indexing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-400' :
+                                item.status === 'uploading' ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-400' :
+                                'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                               }`}>
                                 {statusLabel[item.status]}
                               </span>
                               {!isProcessing && item.status !== 'done' && (
                                 <button
                                   type="button"
-                                  className="text-sm text-gray-400 hover:text-red-600"
+                                  className="text-sm text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400"
                                   onClick={() => setQueue((current) => current.filter((q) => q.id !== item.id))}
                                 >
                                   제거
@@ -285,28 +285,28 @@ export default function DocumentUploadModal({ isOpen, onClose, onUploaded }: Doc
                 </>
               ) : (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Riido 문서 URL</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Riido 문서 URL</label>
                   <input
                     type="url"
                     value={url}
                     disabled={isProcessing}
                     onChange={(e) => setUrl(e.target.value)}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-50"
+                    className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-50 dark:disabled:bg-gray-600"
                     placeholder="https://docs.riido.io/..."
                   />
-                  <p className="mt-1 text-xs text-gray-500">https://docs.riido.io/ 문서만 등록할 수 있습니다.</p>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">https://docs.riido.io/ 문서만 등록할 수 있습니다.</p>
                 </div>
               )}
 
-              {localError && <p className="whitespace-pre-line text-sm text-red-600">{localError}</p>}
+              {localError && <p className="whitespace-pre-line text-sm text-red-600 dark:text-red-400">{localError}</p>}
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4">
+          <div className="flex items-center justify-end gap-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 px-6 py-4">
             <button
               type="button"
               disabled={isProcessing}
-              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
               onClick={handleClose}
             >
               취소
