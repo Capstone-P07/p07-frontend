@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer,
-} from 'recharts';
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { DailySatisfaction } from '../types';
 
 interface Props {
@@ -11,7 +8,6 @@ interface Props {
   changePercent?: number;
 }
 
-// 실데이터 없을 때 mock 사용
 const MOCK: DailySatisfaction[] = [
   { date: '03/17', thumbUp: 6, thumbDown: 2 },
   { date: '03/18', thumbUp: 8, thumbDown: 1 },
@@ -22,10 +18,10 @@ const MOCK: DailySatisfaction[] = [
 ];
 
 export default function SatisfactionChart({ data, changePercent = 12.4 }: Props) {
-  const chartData = (data.length > 0 ? data : MOCK).map((d) => ({
-    date: d.date.slice(5) || d.date, // MM-DD 또는 원본
-    만족: d.thumbUp,
-    불만족: d.thumbDown,
+  const chartData = (data.length > 0 ? data : MOCK).map((item) => ({
+    date: item.date.slice(5) || item.date,
+    만족: item.thumbUp,
+    불만족: item.thumbDown,
   }));
 
   return (
@@ -35,13 +31,14 @@ export default function SatisfactionChart({ data, changePercent = 12.4 }: Props)
           <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
           </svg>
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">답변 만족도</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">응답 만족도</h3>
         </div>
         <span className="text-xs font-medium text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-full">
-          ▲ +{changePercent}%
+          +{changePercent}%
         </span>
       </div>
-      <ResponsiveContainer width="100%" height={200}>
+
+      <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0}>
         <AreaChart data={chartData}>
           <defs>
             <linearGradient id="satisfactionGrad" x1="0" y1="0" x2="0" y2="1">
@@ -52,9 +49,7 @@ export default function SatisfactionChart({ data, changePercent = 12.4 }: Props)
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
           <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-          <Tooltip
-            contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 12 }}
-          />
+          <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 12 }} />
           <Area
             type="monotone"
             dataKey="만족"
