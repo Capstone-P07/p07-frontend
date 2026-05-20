@@ -219,7 +219,7 @@ export default function SettingsPage() {
                 placeholder="현재 비밀번호"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full h-[44px] px-4 bg-[#f2f2f2] rounded-xl text-[14px] outline-none"
+                className="w-full h-[44px] px-4 bg-[#f2f2f2] rounded-xl text-[14px] outline-none text-black"
                 required
               />
               <input
@@ -227,7 +227,7 @@ export default function SettingsPage() {
                 placeholder="새 비밀번호 (6자 이상)"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full h-[44px] px-4 bg-[#f2f2f2] rounded-xl text-[14px] outline-none"
+                className="w-full h-[44px] px-4 bg-[#f2f2f2] rounded-xl text-[14px] outline-none text-black"
                 required
               />
               {passwordError && <p className="text-red-500 text-[12px]">{passwordError}</p>}

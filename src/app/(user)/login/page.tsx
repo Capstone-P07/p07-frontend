@@ -52,7 +52,7 @@ function LoginForm() {
         <div className="relative w-12 h-12">
           <Image src="/logo.svg" alt="Riido" fill className="object-contain" priority />
         </div>
-        <h1 className="text-[22px] font-bold text-black tracking-tight">메이트 Riido</h1>
+        <h1 className="text-[22px] font-bold text-black tracking-tight">뤼이도 Riido</h1>
       </div>
 
       <form
