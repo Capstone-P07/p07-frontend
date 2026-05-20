@@ -9,13 +9,19 @@ interface StatusCounts {
 
 interface StatusStripProps {
   counts: StatusCounts;
+  activeFilter: string;
+  onFilterChange: (status: string) => void;
 }
 
-export default function StatusStrip({ counts }: StatusStripProps) {
+export default function StatusStrip({ counts, activeFilter, onFilterChange }: StatusStripProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
       {/* Total Card */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-5 flex flex-col justify-between">
+      <div
+        onClick={() => onFilterChange('all')}
+        className={`bg-white rounded-lg border shadow-sm p-5 flex flex-col justify-between cursor-pointer transition-colors
+          ${activeFilter === 'all' ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-gray-200 hover:border-gray-300'}`}
+      >
         <div className="text-sm font-medium text-gray-500 mb-2">전체 문서</div>
         <div className="flex items-center">
           <span className="text-3xl font-bold text-gray-900">{counts.total}</span>
@@ -26,7 +32,11 @@ export default function StatusStrip({ counts }: StatusStripProps) {
       </div>
 
       {/* Indexed Card */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-5 flex flex-col justify-between">
+      <div
+        onClick={() => onFilterChange('indexed')}
+        className={`bg-white rounded-lg border shadow-sm p-5 flex flex-col justify-between cursor-pointer transition-colors
+          ${activeFilter === 'indexed' ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-gray-200 hover:border-gray-300'}`}
+      >
         <div className="text-sm font-medium text-gray-500 mb-2">✅ INDEXED</div>
         <div className="flex items-center">
           <span className="text-3xl font-bold text-gray-900">{counts.indexed}</span>
@@ -37,7 +47,11 @@ export default function StatusStrip({ counts }: StatusStripProps) {
       </div>
 
       {/* Indexing Card */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-5 flex flex-col justify-between">
+      <div
+        onClick={() => onFilterChange('indexing')}
+        className={`bg-white rounded-lg border shadow-sm p-5 flex flex-col justify-between cursor-pointer transition-colors
+          ${activeFilter === 'indexing' ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-gray-200 hover:border-gray-300'}`}
+      >
         <div className="text-sm font-medium text-gray-500 mb-2">🔄 INDEXING</div>
         <div className="flex items-center">
           <span className="text-3xl font-bold text-gray-900">{counts.indexing}</span>
@@ -48,7 +62,11 @@ export default function StatusStrip({ counts }: StatusStripProps) {
       </div>
 
       {/* Failed Card */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-5 flex flex-col justify-between">
+      <div
+        onClick={() => onFilterChange('failed')}
+        className={`bg-white rounded-lg border shadow-sm p-5 flex flex-col justify-between cursor-pointer transition-colors
+          ${activeFilter === 'failed' ? 'border-indigo-500 ring-2 ring-indigo-200' : 'border-gray-200 hover:border-gray-300'}`}
+      >
         <div className="text-sm font-medium text-gray-500 mb-2">❌ FAILED</div>
         <div className="flex items-center">
           <span className="text-3xl font-bold text-gray-900">{counts.failed}</span>
