@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const [message, setMessage] = useState("");
   const router = useRouter();
 
   return (
@@ -34,17 +32,12 @@ export default function Home() {
           📄Riido 이용가이드 기반으로 답변해요
         </p>
 
-        <div 
-          onClick ={() => router.push("/chat/new")}
-          className="absolute top-[115px] left-[19px] w-[311px] h-[50px] bg-[#f2f2f2] rounded-[15px] flex items-center overflow-hidden">
-          <input 
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="메세지를 입력하세요."
-            className="w-full h-full bg-transparent px-[18px] text-sm font-medium text-black placeholder-[#979292] outline-none border-none"
-          />
-        </div>
+        <button
+          onClick={() => router.push("/chat/new")}
+          className="absolute top-[115px] left-[19px] w-[311px] h-[50px] bg-[#5745ff] rounded-[15px] flex items-center justify-center"
+        >
+          <span className="text-white text-[15px] font-bold">대화 시작하기</span>
+        </button>
       </div>
 
       <div className="absolute top-[308px] left-0 w-full flex justify-center items-center gap-[4px] h-5">
