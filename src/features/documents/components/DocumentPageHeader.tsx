@@ -34,8 +34,8 @@ export default function DocumentPageHeader({ totalCount, onUploadClick, activeFi
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
       <div className="mb-4 md:mb-0">
-        <h2 className="text-2xl font-bold text-gray-900 mb-1">문서 관리</h2>
-        <p className="text-sm text-gray-500">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">문서 관리</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           현재 총 {totalCount}건의 문서가 시스템에 등록되어 있습니다.
         </p>
       </div>
@@ -43,19 +43,19 @@ export default function DocumentPageHeader({ totalCount, onUploadClick, activeFi
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(prev => !prev)}
-            className={`flex items-center px-4 py-2 border rounded-md text-sm font-medium bg-white transition-colors
+            className={`flex items-center px-4 py-2 border rounded-md text-sm font-medium bg-white dark:bg-gray-800 transition-colors
               ${activeFilter !== 'all'
-                ? 'border-indigo-500 text-indigo-600 ring-2 ring-indigo-200'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400 ring-2 ring-indigo-200 dark:ring-indigo-800'
+                : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
           >
-            <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
             {activeLabel}
           </button>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-1 w-36 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+            <div className="absolute right-0 mt-1 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-10">
               {STATUS_OPTIONS.map(option => (
                 <button
                   key={option.value}
@@ -65,8 +65,8 @@ export default function DocumentPageHeader({ totalCount, onUploadClick, activeFi
                   }}
                   className={`w-full text-left px-4 py-2 text-sm transition-colors
                     ${activeFilter === option.value
-                      ? 'bg-indigo-50 text-indigo-600 font-medium'
-                      : 'text-gray-700 hover:bg-gray-50'}`}
+                      ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                 >
                   {option.label}
                 </button>
