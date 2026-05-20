@@ -85,12 +85,12 @@ export default function ChatRoomPage() {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const logs = res.data.data?.logs ?? [];
-      setMessages((prev) =>
+      setMessages((log: any) =>
         logs.map((log: any, i:number) => ({
         role: log.role,
         content: log.content,
         logId: log.logId,
-        references: prev[i]?.references,
+        references: log.references,
       })));
     } catch {}
   };
