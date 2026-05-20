@@ -393,7 +393,7 @@ export default function ChatRoomPage() {
                                 [msg.logId!]: { ...prev[msg.logId!], comment: e.target.value },
                               }))}
                               placeholder="어떤 점이 불만족스러우셨나요? (선택)"
-                              className="w-[260px] h-[36px] px-3 bg-white rounded-full text-[12px] outline-none border border-[#e0e0e0]"
+                              className="w-[260px] h-[36px] px-3 bg-white rounded-full text-[12px] outline-none border border-[#e0e0e0] text-black"
                             />
                             <button
                               onClick={() => handleFeedbackSubmit(msg.logId!)}
