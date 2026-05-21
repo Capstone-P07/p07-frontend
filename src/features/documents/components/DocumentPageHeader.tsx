@@ -2,10 +2,10 @@ import React,{useState, useRef, useEffect} from 'react';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: '전체' },
-  { value: 'indexed', label: '✅ Indexed' },
-  { value: 'indexing', label: '🔄 Indexing' },
-  { value: 'failed', label: '❌ Failed' },
-  { value: 'pending', label: '⏳ Pending' },
+  { value: 'indexed', label: 'Indexed' },
+  { value: 'indexing', label: 'Indexing' },
+  { value: 'failed', label: 'Failed' },
+  { value: 'pending', label: 'Pending' },
 ];
 
 interface DocumentPageHeaderProps {
@@ -13,9 +13,20 @@ interface DocumentPageHeaderProps {
   onUploadClick: () => void;
   activeFilter: string;
   onFilterChange: (status: string) => void;
+  activeCategoryFilter: string;
+  categoryOptions: string[];
+  onCategoryFilterChange: (category: string) => void;
 }
 
-export default function DocumentPageHeader({ totalCount, onUploadClick, activeFilter, onFilterChange }: DocumentPageHeaderProps) {
+export default function DocumentPageHeader({
+  totalCount,
+  onUploadClick,
+  activeFilter,
+  onFilterChange,
+  activeCategoryFilter,
+  categoryOptions,
+  onCategoryFilterChange,
+}: DocumentPageHeaderProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -39,7 +50,7 @@ export default function DocumentPageHeader({ totalCount, onUploadClick, activeFi
           현재 총 {totalCount}건의 문서가 시스템에 등록되어 있습니다.
         </p>
       </div>
-      <div className="flex items-center space-x-3">
+      <div className="flex flex-wrap items-center gap-3">
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(prev => !prev)}
@@ -74,6 +85,19 @@ export default function DocumentPageHeader({ totalCount, onUploadClick, activeFi
             </div>
           )}
         </div>
+        <select
+          value={activeCategoryFilter}
+          onChange={(e) => onCategoryFilterChange(e.target.value)}
+          className={`rounded-md border bg-white px-4 py-2 text-sm font-medium transition-colors dark:bg-gray-800
+            ${activeCategoryFilter !== 'all'
+              ? 'border-indigo-500 text-indigo-600 ring-2 ring-indigo-200 dark:text-indigo-400 dark:ring-indigo-800'
+              : 'border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+        >
+          <option value="all">전체 카테고리</option>
+          {categoryOptions.map((category) => (
+            <option key={category} value={category}>{category}</option>
+          ))}
+        </select>
         <button
           onClick={onUploadClick}
           className="flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
