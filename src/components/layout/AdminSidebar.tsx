@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '@/components/ThemeProvider';
 
@@ -82,10 +83,8 @@ export default function AdminSidebar() {
       {/* 로고 */}
       <div className="px-5 py-5 border-b border-gray-100 dark:border-[#1e2235]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#6d28d9] to-[#0d9488] flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-            </svg>
+          <div className="relative w-8 h-8 shrink-0">
+            <Image src="/logo.svg" alt="Riido" fill className="object-contain" priority />
           </div>
           <div>
             <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">Riido Admin</p>

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import type { DocumentDetail } from '../types';
-import MarkdownEditor from './MarkdownEditor';
+import MarkdownEditor, { type MarkdownEditorTab } from './MarkdownEditor';
 import {
   useDeleteDocument,
   useReindexDocument,
   useUpdateDocument,
 } from '../hooks/useDocumentMutations';
+import { DOCUMENT_CATEGORY_OPTIONS } from '../types';
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 
@@ -21,8 +22,17 @@ export default function DocumentDetailPanel({ document, isOpen, onClose, onMutat
   const reidx = useReindexDocument();
   const upd = useUpdateDocument();
   const [title, setTitle] = useState(document?.title ?? '');
+  const [category, setCategory] = useState(document?.category ?? '');
+  const [markdown, setMarkdown] = useState(document?.markdown ?? '');
+  const [markdownTab, setMarkdownTab] = useState<MarkdownEditorTab>('preview');
   const [replacementFile, setReplacementFile] = useState<File | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
+  const categoryOptions = Array.from(
+    new Set<string>([
+      ...DOCUMENT_CATEGORY_OPTIONS,
+      ...(document?.category ? [document.category] : []),
+    ]),
+  );
 
   if (!isOpen || !document) return null;
 
@@ -70,13 +80,25 @@ export default function DocumentDetailPanel({ document, isOpen, onClose, onMutat
 
   const handleSave = async () => {
     const nextTitle = title.trim();
+    const nextCategory = category.trim();
+    const nextMarkdown = markdown;
     if (!nextTitle) {
       setLocalError('문서 제목을 입력하세요.');
+      return;
+    }
+    if (!nextCategory) {
+      setLocalError('카테고리를 선택하세요.');
+      return;
+    }
+    if (nextMarkdown !== document.markdown && !nextMarkdown.trim()) {
+      setLocalError('Markdown 본문을 입력하세요.');
       return;
     }
     try {
       await upd.mutate(document.id, {
         title: nextTitle !== document.title ? nextTitle : undefined,
+        category: nextCategory !== document.category ? nextCategory : undefined,
+        markdown: nextMarkdown !== document.markdown ? nextMarkdown : undefined,
         file: replacementFile ?? undefined,
       });
       setReplacementFile(null);
@@ -88,7 +110,11 @@ export default function DocumentDetailPanel({ document, isOpen, onClose, onMutat
 
   const busy = del.isPending || reidx.isPending || upd.isPending;
   const mutationError = localError ?? del.error ?? reidx.error ?? upd.error;
-  const hasChanges = title.trim() !== document.title || replacementFile != null;
+  const hasChanges =
+    title.trim() !== document.title ||
+    category.trim() !== document.category ||
+    markdown !== document.markdown ||
+    replacementFile != null;
 
   return (
     <div className="fixed inset-0 z-40 overflow-hidden">
@@ -138,24 +164,42 @@ export default function DocumentDetailPanel({ document, isOpen, onClose, onMutat
                 <div>
                   <h3 className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">Category</h3>
                   <span className="inline-flex items-center rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:text-gray-400">
-                    {document.category}
+                    {category}
                   </span>
                 </div>
               </div>
 
               <div className="mb-6 space-y-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 p-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">문서 제목</label>
-                  <input
-                    type="text"
-                    value={title}
-                    disabled={busy}
-                    onChange={(e) => {
-                      setTitle(e.target.value);
-                      setLocalError(null);
-                    }}
-                    className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-100 dark:disabled:bg-gray-700"
-                  />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">문서 제목</label>
+                    <input
+                      type="text"
+                      value={title}
+                      disabled={busy}
+                      onChange={(e) => {
+                        setTitle(e.target.value);
+                        setLocalError(null);
+                      }}
+                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-100 dark:disabled:bg-gray-700"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">카테고리</label>
+                    <select
+                      value={category}
+                      disabled={busy}
+                      onChange={(e) => {
+                        setCategory(e.target.value);
+                        setLocalError(null);
+                      }}
+                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-100 dark:disabled:bg-gray-700"
+                    >
+                      {categoryOptions.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Markdown 파일 교체</label>
@@ -191,11 +235,18 @@ export default function DocumentDetailPanel({ document, isOpen, onClose, onMutat
                 </div>
               )}
 
-              {document.markdown && (
-                <div className="h-[600px]">
-                  <MarkdownEditor initialContent={document.markdown} />
-                </div>
-              )}
+              <div className="h-[600px]">
+                <MarkdownEditor
+                  value={markdown}
+                  onChange={(value) => {
+                    setMarkdown(value);
+                    setLocalError(null);
+                  }}
+                  activeTab={markdownTab}
+                  onTabChange={setMarkdownTab}
+                  disabled={busy}
+                />
+              </div>
 
               {mutationError && <p className="mt-4 text-sm text-red-600 dark:text-red-400">{mutationError}</p>}
             </div>
