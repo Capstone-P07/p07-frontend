@@ -150,49 +150,51 @@ export default function DocumentUploadModal({ isOpen, onClose, onUploaded }: Doc
             </div>
 
             <div className="mt-5 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">문서 제목</label>
-                <input
-                  type="text"
-                  value={title}
-                  disabled={isProcessing}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:disabled:bg-gray-600"
-                  placeholder="비워두면 문서의 첫 제목을 사용합니다"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">카테고리</label>
-                <select
-                  value={category}
-                  disabled={isProcessing}
-                  onChange={(e) => {
-                    setCategory(e.target.value);
-                    setLocalError(null);
-                  }}
-                  className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:disabled:bg-gray-600"
-                >
-                  <option value="">카테고리 선택</option>
-                  {DOCUMENT_CATEGORY_OPTIONS.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                  <option value={CUSTOM_CATEGORY_VALUE}>직접 추가</option>
-                </select>
-                {category === CUSTOM_CATEGORY_VALUE && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">문서 제목</label>
                   <input
                     type="text"
-                    value={customCategory}
+                    value={title}
+                    disabled={isProcessing}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:disabled:bg-gray-600"
+                    placeholder="비워두면 첫 제목 사용"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">카테고리</label>
+                  <select
+                    value={category}
                     disabled={isProcessing}
                     onChange={(e) => {
-                      setCustomCategory(e.target.value);
+                      setCategory(e.target.value);
                       setLocalError(null);
                     }}
-                    maxLength={20}
-                    className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:disabled:bg-gray-600"
-                    placeholder="새 카테고리 입력"
-                  />
-                )}
+                    className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:disabled:bg-gray-600"
+                  >
+                    <option value="">카테고리 선택</option>
+                    {DOCUMENT_CATEGORY_OPTIONS.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                    <option value={CUSTOM_CATEGORY_VALUE}>직접 추가</option>
+                  </select>
+                  {category === CUSTOM_CATEGORY_VALUE && (
+                    <input
+                      type="text"
+                      value={customCategory}
+                      disabled={isProcessing}
+                      onChange={(e) => {
+                        setCustomCategory(e.target.value);
+                        setLocalError(null);
+                      }}
+                      maxLength={20}
+                      className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 disabled:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:disabled:bg-gray-600"
+                      placeholder="새 카테고리 입력"
+                    />
+                  )}
+                </div>
               </div>
 
               <div>

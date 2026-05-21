@@ -25,6 +25,7 @@ interface BackendDocSummary {
 // BE findOne() 응답
 interface BackendDocDetail extends BackendDocSummary {
   createdAt: string;
+  markdown?: string;
 }
 
 interface Envelope<T> {
@@ -53,8 +54,7 @@ export async function getDocument(id: number): Promise<DocumentDetail> {
   const b = res.data.data;
   return {
     ...toSummary(b),
-    // BE 가 markdown 본문을 돌려주지 않는다 (저장하지 않음). 추후 chunks 합치기로 대체 가능.
-    markdown: "",
+    markdown: b.markdown ?? "",
   };
 }
 
@@ -86,6 +86,8 @@ export async function uploadDocument(
 
 export interface UpdateDocumentPayload {
   title?: string;
+  category?: string;
+  markdown?: string;
   file?: File;
 }
 
@@ -94,7 +96,9 @@ export async function updateDocument(
   payload: UpdateDocumentPayload,
 ): Promise<{ docId: number; indexStatus: DocumentStatus; message: string }> {
   const fd = new FormData();
-  if (payload.title) fd.append("title", payload.title);
+  if (payload.title !== undefined) fd.append("title", payload.title);
+  if (payload.category !== undefined) fd.append("category", payload.category);
+  if (payload.markdown !== undefined) fd.append("markdown", payload.markdown);
   if (payload.file) fd.append("file", payload.file);
 
   const res = await api.put<
