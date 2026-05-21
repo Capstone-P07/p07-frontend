@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import DocumentPageHeader from '@/features/documents/components/DocumentPageHeader';
 import StatusStrip from '@/features/documents/components/StatusStrip';
 import DocumentTable from '@/features/documents/components/DocumentTable';
@@ -9,6 +9,7 @@ import DocumentDetailPanel from '@/features/documents/components/DocumentDetailP
 import { useDocuments } from '@/features/documents/hooks/useDocuments';
 import { useDocumentDetail } from '@/features/documents/hooks/useDocumentDetail';
 import type { DocumentSummary } from '@/features/documents/types';
+import { DOCUMENT_CATEGORY_OPTIONS } from '@/features/documents/types';
 
 export default function DocumentsPage() {
   const { data: documents, counts, isLoading, refetch: refetchDocuments } = useDocuments();
@@ -17,12 +18,24 @@ export default function DocumentsPage() {
   const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
 
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   
   const { data: documentDetail, refetch: refetchDetail } = useDocumentDetail(selectedDocumentId);
 
-  const filteredDocuments = statusFilter === 'all'
-    ? documents
-    : documents.filter(doc => doc.status === statusFilter);
+  const categoryOptions = useMemo(() => {
+    const categories = new Set(documents.map((doc) => doc.category));
+    const ordered = DOCUMENT_CATEGORY_OPTIONS.filter((category) => categories.has(category));
+    const custom = Array.from(categories)
+      .filter((category) => !DOCUMENT_CATEGORY_OPTIONS.includes(category as (typeof DOCUMENT_CATEGORY_OPTIONS)[number]))
+      .sort((a, b) => a.localeCompare(b, 'ko'));
+    return [...ordered, ...custom];
+  }, [documents]);
+
+  const filteredDocuments = documents.filter((doc) => {
+    const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
+    const matchesCategory = categoryFilter === 'all' || doc.category === categoryFilter;
+    return matchesStatus && matchesCategory;
+  });
 
   const handleListMutated = () => {
     void refetchDocuments();
@@ -59,6 +72,9 @@ export default function DocumentsPage() {
           onUploadClick={handleUploadClick} 
           activeFilter={statusFilter}
           onFilterChange={handleFilterChange} 
+          activeCategoryFilter={categoryFilter}
+          categoryOptions={categoryOptions}
+          onCategoryFilterChange={setCategoryFilter}
         />
         
         {isLoading ? (

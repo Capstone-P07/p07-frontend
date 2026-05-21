@@ -4,16 +4,17 @@
 
 import api from "@/lib/api";
 import type {
-  DocumentCategory,
   DocumentDetail,
   DocumentStatus,
   DocumentSummary,
 } from "./types";
+import { UNCATEGORIZED_CATEGORY } from "./types";
 
 // BE findAll() 응답 (docs.service.ts) 의 한 항목
 interface BackendDocSummary {
   docId: number;
   title: string;
+  category?: string | null;
   source: "file" | "url";
   sourceValue: string | null;
   chunkCount: number;
@@ -32,14 +33,11 @@ interface Envelope<T> {
   error: { code: string; message: string } | null;
 }
 
-// BE 는 category 를 응답에 포함하지 않는다 (D3 결정: NULL 유지). 임시로 첫 카테고리 표시.
-const DEFAULT_CATEGORY: DocumentCategory = "시작하기";
-
 function toSummary(b: BackendDocSummary): DocumentSummary {
   return {
     id: b.docId,
     title: b.title,
-    category: DEFAULT_CATEGORY,
+    category: b.category?.trim() || UNCATEGORIZED_CATEGORY,
     status: b.indexStatus,
     sourceUrl: b.sourceValue ?? undefined,
   };
@@ -61,8 +59,8 @@ export async function getDocument(id: number): Promise<DocumentDetail> {
 }
 
 export interface UploadDocumentPayload {
-  source: "file" | "url";
-  file?: File;
+  file: File;
+  category: string;
   url?: string;
   title?: string;
 }
@@ -71,16 +69,17 @@ export async function uploadDocument(
   payload: UploadDocumentPayload,
 ): Promise<{ docId: number; indexStatus: DocumentStatus; message: string }> {
   const fd = new FormData();
-  fd.append("source", payload.source);
+  fd.append("source", "file");
+  fd.append("category", payload.category);
   if (payload.title) fd.append("title", payload.title);
-  if (payload.source === "file" && payload.file) fd.append("file", payload.file);
+  fd.append("file", payload.file);
   if (payload.url) fd.append("url", payload.url);
 
   // 주의: Content-Type 을 명시하지 않는다 — axios 가 FormData 를 인식하면
   // boundary 가 포함된 `multipart/form-data; boundary=...` 를 자동 설정한다.
   // 수동으로 'multipart/form-data' 만 주면 boundary 가 빠져 multer 가 파싱 실패한다.
   const res = await api.post<
-    Envelope<{ docId: number; title: string; indexStatus: DocumentStatus; message: string }>
+    Envelope<{ docId: number; title: string; category: string; indexStatus: DocumentStatus; message: string }>
   >("/docs", fd);
   return res.data.data;
 }
