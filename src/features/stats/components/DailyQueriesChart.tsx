@@ -3,21 +3,15 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { DailyQueryStat } from '../types';
 
-const MOCK_DATA: DailyQueryStat[] = [
-  { date: '03/17', success: 18, failure: 2 },
-  { date: '03/18', success: 24, failure: 3 },
-  { date: '03/19', success: 16, failure: 4 },
-  { date: '03/20', success: 28, failure: 2 },
-  { date: '03/21', success: 22, failure: 1 },
-  { date: '03/22', success: 26, failure: 3 },
-  { date: '오늘', success: 20, failure: 2 },
-];
-
 interface Props {
   totalQuestions?: number;
+  data: DailyQueryStat[];
+  loading?: boolean;
 }
 
-export default function DailyQueriesChart({ totalQuestions }: Props) {
+export default function DailyQueriesChart({ totalQuestions, data, loading }: Props) {
+  if (loading) return <div className="animate-pulse h-[200px] bg-gray-100 dark:bg-[#1e2235] rounded-2xl" />;
+  
   return (
     <div className="bg-white dark:bg-[#1e2235] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#2a2f45]">
       <div className="flex items-center justify-between mb-6">
@@ -46,7 +40,7 @@ export default function DailyQueriesChart({ totalQuestions }: Props) {
       </div>
 
       <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0}>
-        <BarChart data={MOCK_DATA} barSize={20} barGap={4}>
+        <BarChart data={data} barSize={20} barGap={4}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
           <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
