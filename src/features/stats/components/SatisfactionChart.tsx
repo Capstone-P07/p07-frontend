@@ -17,9 +17,9 @@ const MOCK: DailySatisfaction[] = [
   { date: '오늘', thumbUp: 12, thumbDown: 1 },
 ];
 
-export default function SatisfactionChart({ data, changePercent = 12.4 }: Props) {
-  const chartData = (data.length > 0 ? data : MOCK).map((item) => ({
-    date: item.date.slice(5) || item.date,
+export default function SatisfactionChart({ data, changePercent = 0 }: Props) {
+  const chartData = (data.length > 0 ? data : []).map((item) => ({
+    date: item.date,
     만족: item.thumbUp,
     불만족: item.thumbDown,
   }));

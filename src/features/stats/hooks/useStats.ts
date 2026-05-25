@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { getSatisfactionStats, getStatsOverview, getTopQueries } from '../api';
-import type { SatisfactionStats, StatsOverview, StatsPeriod, TopQuery } from '../types';
+import { getSatisfactionStats, getStatsOverview, getTopQueries, getDailyStats } from '../api';
+import type { SatisfactionStats, StatsOverview, StatsPeriod, TopQuery, DailyQueryStat } from '../types';
 
 const LOAD_ERROR_MESSAGE = '데이터를 불러오지 못했습니다.';
 
@@ -102,6 +102,22 @@ export function useSatisfactionStats(period: StatsPeriod) {
     return () => {
       alive = false;
     };
+  }, [period]);
+
+  return { data, loading };
+}
+
+export function useDailyStats(period: StatsPeriod = '7d') {
+  const [data, setData] = useState<DailyQueryStat[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    getDailyStats(period)
+      .then(d => { if (alive) setData(d); })
+      .catch(() => { if (alive) setData([]); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
   }, [period]);
 
   return { data, loading };
