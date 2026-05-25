@@ -5,7 +5,7 @@ import { useState } from 'react';
 import PeriodTabs from '@/features/stats/components/PeriodTabs';
 import StatCard from '@/features/stats/components/StatCard';
 import TopQueriesList from '@/features/stats/components/TopQueriesList';
-import { useSatisfactionStats, useStatsOverview, useTopQueries } from '@/features/stats/hooks/useStats';
+import { useSatisfactionStats, useStatsOverview, useTopQueries, useDailyStats } from '@/features/stats/hooks/useStats';
 import type { StatsPeriod } from '@/features/stats/types';
 
 const CategoryChart = dynamic(() => import('@/features/stats/components/CategoryChart'), { ssr: false });
@@ -75,7 +75,8 @@ export default function AnalyticsPage() {
   const { data: overview, loading: overviewLoading } = useStatsOverview(period);
   const { data: topQueries, loading: topQueriesLoading } = useTopQueries(period);
   const { data: satisfaction } = useSatisfactionStats(period);
-
+  const { data: dailyStats, loading: dailyLoading } = useDailyStats(period);
+  
   const totalQuestions = overview?.totalQuestions ?? 0;
   const unanswered = overview?.totalUnanswered ?? 0;
   const successRate = totalQuestions > 0 ? ((totalQuestions - unanswered) / totalQuestions) * 100 : 0;
@@ -129,7 +130,10 @@ export default function AnalyticsPage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <DailyQueriesChart totalQuestions={totalQuestions} />
+        <DailyQueriesChart 
+          totalQuestions={totalQuestions}
+          data = {dailyStats}
+          loading = {dailyLoading} />
         <SatisfactionChart data={satisfaction?.daily ?? []} changePercent={12.4} />
       </div>
 
