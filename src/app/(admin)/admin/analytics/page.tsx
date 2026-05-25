@@ -76,7 +76,7 @@ export default function AnalyticsPage() {
   const { data: topQueries, loading: topQueriesLoading } = useTopQueries(period);
   const { data: satisfaction } = useSatisfactionStats(period);
   const { data: dailyStats, loading: dailyLoading } = useDailyStats(period);
-  
+
   const totalQuestions = overview?.totalQuestions ?? 0;
   const unanswered = overview?.totalUnanswered ?? 0;
   const successRate = totalQuestions > 0 ? ((totalQuestions - unanswered) / totalQuestions) * 100 : 0;
@@ -85,6 +85,17 @@ export default function AnalyticsPage() {
   const successParts = formatPercentParts(successRate);
   const failParts = formatPercentParts(failRate);
   const satisfactionParts = formatPercentParts(satisfactionRate);
+  const daily = satisfaction?.daily ?? [];
+  const changePercent = (() => {
+    if (daily.length < 2) return 0;
+    const prev = daily[daily.length - 2];
+    const curr = daily[daily.length - 1];
+    const prevRate = prev.thumbUp + prev.thumbDown > 0
+      ? (prev.thumbUp / (prev.thumbUp + prev.thumbDown)) * 100 : 0;
+    const currRate = curr.thumbUp + curr.thumbDown > 0
+      ? (curr.thumbUp / (curr.thumbUp + curr.thumbDown)) * 100 : 0;
+    return Math.round((currRate - prevRate) * 10) / 10;
+  })();
 
   const today = new Date();
   const from = new Date(today);
@@ -134,7 +145,7 @@ export default function AnalyticsPage() {
           totalQuestions={totalQuestions}
           data = {dailyStats}
           loading = {dailyLoading} />
-        <SatisfactionChart data={satisfaction?.daily ?? []} changePercent={12.4} />
+        <SatisfactionChart data={satisfaction?.daily ?? []} changePercent={changePercent} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

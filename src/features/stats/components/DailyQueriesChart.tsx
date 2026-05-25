@@ -3,11 +3,6 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { DailyQueryStat } from '../types';
 
-const formatDate = (date: string) => {
-  const d = new Date(date);
-  return `${d.getMonth() + 1}/${d.getDate()}`;
-};
-
 interface Props {
   totalQuestions?: number;
   data: DailyQueryStat[];
@@ -47,7 +42,7 @@ export default function DailyQueriesChart({ totalQuestions, data, loading }: Pro
       <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0}>
         <BarChart data={data} barSize={20} barGap={4}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-          <XAxis dataKey="date" tickFormatter={formatDate} tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
+          <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
           <Tooltip
             contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 12 }}
