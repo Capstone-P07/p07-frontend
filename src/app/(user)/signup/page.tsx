@@ -12,15 +12,40 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [generalError, setGeneralError] = useState("");
+
+  const handlePasswordCheckChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPasswordCheck(value);
+    if (password && value && password !== value) {
+      setPasswordError("비밀번호가 일치하지 않습니다.");
+    } else {
+      setPasswordError("");
+    }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setEmailError("");
+    setPasswordError("");
     setGeneralError("");
 
+    if (password.length < 8) {
+      setPasswordError("비밀번호는 8자 이상이어야 합니다.");
+      return;
+    }
+
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+
+    if (!hasLetter || !hasNumber) {
+      setPasswordError("비밀번호는 영문과 숫자를 모두 포함해야 합니다.");
+      return;
+    }
+
     if (password !== passwordCheck) {
-      setGeneralError("비밀번호가 일치하지 않습니다.");
+      setPasswordError("비밀번호가 일치하지 않습니다.");
       return;
     }
 
@@ -75,23 +100,28 @@ export default function SignUpPage() {
             {emailError && <p className="text-red-500 text-[11px] mt-1 ml-1">{emailError}</p>}
           </div>
 
-          <input
-            className="w-full h-[41px] px-4 bg-white rounded-lg border border-[#dfdfdf] text-sm text-gray-700 placeholder-[#b3b3b3] outline-none focus:border-[#5d4ff9]"
-            placeholder="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div className="w-full">
+            <input
+              className={`w-full h-[41px] px-4 bg-white rounded-lg border text-sm text-gray-700 placeholder-[#b3b3b3] outline-none ${passwordError ? 'border-red-500' : 'border-[#dfdfdf]'} focus:border-[#5d4ff9]`}
+              placeholder="password (영문+숫자 8자 이상)"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-          <input
-            className="w-full h-[41px] px-4 bg-white rounded-lg border border-[#dfdfdf] text-sm text-gray-700 placeholder-[#b3b3b3] outline-none focus:border-[#5d4ff9]"
-            placeholder="password check"
-            type="password"
-            value={passwordCheck}
-            onChange={(e) => setPasswordCheck(e.target.value)}
-            required
-          />
+          <div className="w-full">
+            <input
+              className={`w-full h-[41px] px-4 bg-white rounded-lg border text-sm text-gray-700 placeholder-[#b3b3b3] outline-none ${passwordError ? 'border-red-500' : 'border-[#dfdfdf]'} focus:border-[#5d4ff9]`}
+              placeholder="password check"
+              type="password"
+              value={passwordCheck}
+              onChange={handlePasswordCheckChange}
+              required
+            />
+            {passwordError && <p className="text-red-500 text-[11px] mt-1 ml-1">{passwordError}</p>}
+          </div>
 
           {generalError && <p className="text-red-500 text-[11px] text-center">{generalError}</p>}
 
