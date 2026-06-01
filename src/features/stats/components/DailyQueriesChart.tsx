@@ -2,6 +2,7 @@
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { DailyQueryStat } from '../types';
+import { useTheme } from '@/components/ThemeProvider';
 
 interface Props {
   totalQuestions?: number;
@@ -11,7 +12,17 @@ interface Props {
 
 export default function DailyQueriesChart({ totalQuestions, data, loading }: Props) {
   if (loading) return <div className="animate-pulse h-[200px] bg-gray-100 dark:bg-[#1e2235] rounded-2xl" />;
-  
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  const tooltipStyle = {
+    background: isDark ? '#1e2235' : '#fff',
+    border: `1px solid ${isDark ? '#2a2f45' : '#e5e7eb'}`,
+    borderRadius: 8,
+    fontSize: 12,
+    color: isDark ? '#e5e7eb' : '#111827',
+  };
+
   return (
     <div className="bg-white dark:bg-[#1e2235] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#2a2f45]">
       <div className="flex items-center justify-between mb-6">
@@ -45,8 +56,8 @@ export default function DailyQueriesChart({ totalQuestions, data, loading }: Pro
           <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
           <Tooltip
-            contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 12 }}
-            cursor={{ fill: '#f9fafb' }}
+            contentStyle={tooltipStyle}
+            cursor={{ fill: isDark ? '#2a2f45' : '#f9fafb' }}
           />
           <Bar dataKey="success" name="성공" fill="#6d28d9" radius={[4, 4, 0, 0]} />
           <Bar dataKey="failure" name="실패" fill="#e5e7eb" radius={[4, 4, 0, 0]} />

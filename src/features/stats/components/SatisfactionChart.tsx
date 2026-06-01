@@ -2,6 +2,7 @@
 
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { DailySatisfaction } from '../types';
+import { useTheme } from '@/components/ThemeProvider';
 
 interface Props {
   data: DailySatisfaction[];
@@ -23,6 +24,17 @@ export default function SatisfactionChart({ data, changePercent = 0 }: Props) {
     만족: item.thumbUp,
     불만족: item.thumbDown,
   }));
+
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  const tooltipStyle = {
+    background: isDark ? '#1e2235' : '#fff',
+    border: `1px solid ${isDark ? '#2a2f45' : '#e5e7eb'}`,
+    borderRadius: 8,
+    fontSize: 12,
+    color: isDark ? '#e5e7eb' : '#111827',
+  };
 
   return (
     <div className="bg-white dark:bg-[#1e2235] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#2a2f45]">
@@ -49,7 +61,7 @@ export default function SatisfactionChart({ data, changePercent = 0 }: Props) {
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
           <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-          <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 12 }} />
+          <Tooltip contentStyle={tooltipStyle} />
           <Area
             type="monotone"
             dataKey="만족"
