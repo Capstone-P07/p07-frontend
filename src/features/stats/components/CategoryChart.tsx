@@ -2,6 +2,7 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import type { CategoryItem } from '../types';
+import { useTheme } from '@/components/ThemeProvider';
 
 const MOCK_CATEGORIES: CategoryItem[] = [
   { name: '시작하기', value: 40, color: '#0d9488' },
@@ -16,6 +17,17 @@ interface Props {
 
 export default function CategoryChart({ totalQueries = 14 }: Props) {
   const data = MOCK_CATEGORIES;
+
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  const tooltipStyle = {
+    background: isDark ? '#1e2235' : '#fff',
+    border: `1px solid ${isDark ? '#2a2f45' : '#e5e7eb'}`,
+    borderRadius: 8,
+    fontSize: 12,
+    color: isDark ? '#e5e7eb' : '#111827',
+  };
 
   return (
     <div className="bg-white dark:bg-[#1e2235] rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-[#2a2f45]">
@@ -55,7 +67,7 @@ export default function CategoryChart({ totalQueries = 14 }: Props) {
                   <Cell key={entry.name} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => [`${value}%`, '']} contentStyle={{ borderRadius: 8, fontSize: 12 }} />
+              <Tooltip formatter={(value) => [`${value}%`, '']} contentStyle={tooltipStyle} />
             </PieChart>
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
