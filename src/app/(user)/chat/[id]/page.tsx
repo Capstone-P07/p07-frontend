@@ -317,7 +317,14 @@ export default function ChatRoomPage() {
                   <div className="mt-3 pt-3 border-t border-gray-100">
                     <p className="text-[11px] text-[#959595] font-medium mb-2">참고 문서</p>
                     <div className="flex flex-col gap-1">
-                      {msg.references.map((ref,j) => (
+                      {msg.references
+                        .reduce((acc: { title: string; url: string }[], ref) => {
+                        if (!acc.find(r => r.url === ref.url)) {
+                          acc.push({ title: ref.title, url: ref.url });
+                        }
+                        return acc;
+                      }, [])
+                      .map((ref,j) => (
                         <a
                           key={j}
                           href={ref.url}
@@ -325,7 +332,7 @@ export default function ChatRoomPage() {
                           rel="noopener noreferrer"
                           className="text-[12px] text-[#5745ff] font-medium hover:underline truncate"
                         >
-                          📄 {ref.section ?? ref.title}
+                          📄 {ref.title}
                         </a>
                       ))}
                     </div>
