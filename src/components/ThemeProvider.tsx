@@ -10,7 +10,7 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: 'dark',
+  theme: 'light',
   toggle: () => {},
 });
 
@@ -19,12 +19,13 @@ export function useTheme() {
 }
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark');
+  const [theme, setTheme] = useState<Theme>('light');
 
-  // 마운트 시 localStorage에서 복원
+  // 시스템 설정 맞춤, 마운트 시 localStorage에서 복원
   useEffect(() => {
     const saved = localStorage.getItem('theme') as Theme | null;
-    const initial = saved ?? 'dark';
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initial = saved ?? (systemDark ? 'dark' : 'light');
     setTheme(initial);
     document.documentElement.classList.toggle('dark', initial === 'dark');
   }, []);
