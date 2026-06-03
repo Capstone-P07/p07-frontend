@@ -19,11 +19,13 @@ const MOCK: DailySatisfaction[] = [
 ];
 
 export default function SatisfactionChart({ data, changePercent = 0 }: Props) {
-  const chartData = (data.length > 0 ? data : []).map((item) => ({
-    date: item.date,
-    만족: item.thumbUp,
-    불만족: item.thumbDown,
-  }));
+  const chartData = (data.length > 0 ? data : []).map((item) => {
+    const total = item.thumbUp + item.thumbDown;
+    return {
+      date: item.date,
+      만족: total > 0 ? Math.round((item.thumbUp / total) * 100) : 0,
+    };
+  });
 
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -61,7 +63,7 @@ export default function SatisfactionChart({ data, changePercent = 0 }: Props) {
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
           <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-          <Tooltip contentStyle={tooltipStyle} />
+          <Tooltip contentStyle={tooltipStyle} formatter = {(value) => [`${value}%`, '만족도']}/>
           <Area
             type="monotone"
             dataKey="만족"

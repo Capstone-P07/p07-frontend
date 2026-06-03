@@ -15,7 +15,17 @@ export default function RootLayout({
         {/* 페이지 로드 시 깜빡임 없이 저장된 테마 즉시 적용 */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}})();`,
+            __html: 
+            `(function(){
+              var t = localStorage.getItem('theme');
+              var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+              var theme = t ?? (systemDark ? 'dark' : 'light');
+              if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+              } else {
+                document.documentElement.classList.remove('dark');
+              }
+            })();`,
           }}
         />
       </head>
